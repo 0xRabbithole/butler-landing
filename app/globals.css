@@ -1,0 +1,75 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --lavender-bg: #EFE6F6;
+  --lavender-deep: #D1BCE4;
+  --ink: #160F22;
+}
+
+html, body {
+  background: var(--lavender-bg);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+}
+
+::selection {
+  background: #160F22;
+  color: #F5C842;
+}
+
+/* Hand-drawn underline */
+.scribble-underline {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 12'><path d='M2,8 Q50,2 100,6 T198,5' stroke='%23F5C842' stroke-width='4' fill='none' stroke-linecap='round'/></svg>");
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-size: 100% 0.35em;
+  padding-bottom: 0.1em;
+}
+
+/* Grainy soft paper texture overlay for whole page */
+.paper-grain::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 100;
+  opacity: 0.08;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.55'/></svg>");
+}
+
+/* Soft card shadow in the reference style */
+.card-shadow {
+  box-shadow:
+    0 1px 0 rgba(22, 15, 34, 0.06),
+    0 8px 24px -12px rgba(22, 15, 34, 0.18),
+    0 30px 60px -30px rgba(22, 15, 34, 0.15);
+}
+
+/* Word reveal helper */
+.word {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: top;
+}
+.word > span {
+  display: inline-block;
+  transform: translateY(110%);
+  will-change: transform;
+}
+
+/* Marquee */
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.marquee-track {
+  animation: marquee 42s linear infinite;
+}
+
+/* Custom cursor blob - optional */
+html { scroll-behavior: smooth; }

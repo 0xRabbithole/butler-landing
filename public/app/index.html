@@ -1,0 +1,1905 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#EFE6F6" />
+<title>Butler — MVP preview</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='14' fill='%23160F22'/><text x='16' y='22' text-anchor='middle' font-family='Georgia' font-size='18' fill='%23F5C842' font-style='italic'>B</text></svg>">
+<style>
+  :root {
+    --lavender: #EFE6F6;
+    --lavender-2: #E2D3EF;
+    --lavender-3: #D1BCE4;
+    --lavender-line: #9A86B8;
+    --ink: #160F22;
+    --ink-soft: #2A1F3D;
+    --ink-muted: #5A4E6E;
+    --cream: #F5E9C8;
+    --mint: #CFE5D3;
+    --sun: #F5C842;
+    --blush: #F2C4C4;
+    --white: #ffffff;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body {
+    margin: 0; padding: 0;
+    font-family: 'Inter', system-ui, sans-serif;
+    color: var(--ink);
+    background: linear-gradient(140deg, #F7F2FB 0%, var(--lavender) 35%, var(--lavender-2) 100%);
+    min-height: 100svh;
+  }
+  body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    overflow-x: hidden;
+  }
+  /* paper grain */
+  body::before {
+    content: "";
+    position: fixed; inset: 0;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.55'/></svg>");
+    opacity: 0.07;
+    mix-blend-mode: multiply;
+    z-index: 999;
+  }
+
+  /* floating background squiggles on desktop */
+  .bg-squiggle {
+    position: fixed;
+    pointer-events: none;
+    opacity: 0.5;
+    z-index: 0;
+  }
+  .bg-squiggle.one { top: 8%; left: 4%; }
+  .bg-squiggle.two { bottom: 10%; right: 6%; }
+  .bg-squiggle.three { top: 40%; right: 10%; }
+
+  /* Phone shell */
+  .stage {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    z-index: 2;
+  }
+  .stage-label {
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    color: var(--ink-muted);
+    font-size: 18px;
+  }
+  .stage-label b {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-style: normal;
+    color: var(--ink);
+  }
+  .phone {
+    width: 390px;
+    max-width: calc(100vw - 48px);
+    height: 844px;
+    max-height: calc(100svh - 100px);
+    background: var(--white);
+    border: 10px solid var(--ink);
+    border-radius: 48px;
+    box-shadow:
+      0 40px 80px -30px rgba(22,15,34,0.35),
+      0 10px 30px -10px rgba(22,15,34,0.2);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  .notch {
+    position: absolute;
+    top: 14px; left: 50%;
+    transform: translateX(-50%);
+    width: 120px; height: 28px;
+    background: var(--ink);
+    border-radius: 20px;
+    z-index: 5;
+  }
+
+  .statusbar {
+    padding: 18px 28px 6px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--ink);
+  }
+  .statusbar .icons {
+    display: flex; gap: 5px; align-items: center;
+  }
+
+  /* Screen viewport */
+  .screens {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+  }
+  .screen {
+    position: absolute;
+    inset: 0;
+    padding: 14px 24px 110px;
+    overflow-y: auto;
+    opacity: 0;
+    transform: translate3d(16px, 0, 0);
+    transition: opacity 220ms ease-out, transform 240ms cubic-bezier(.22,1,.36,1);
+    pointer-events: none;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    will-change: transform, opacity;
+    visibility: hidden;
+    contain: layout paint;
+  }
+  .screen::-webkit-scrollbar { display: none; }
+  .screen.active {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+    pointer-events: auto;
+    visibility: visible;
+  }
+  .screen.leaving {
+    transform: translate3d(-16px, 0, 0);
+    visibility: visible;
+  }
+
+  /* Home greeting */
+  .greeting-eyebrow {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+  }
+  .greeting-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    font-size: 34px;
+    line-height: 1.02;
+    margin: 6px 0 4px;
+  }
+  .greeting-title i {
+    font-family: 'Instrument Serif', serif;
+    font-weight: 400;
+    font-style: italic;
+    color: var(--ink-soft);
+  }
+  .greeting-sub {
+    font-size: 14px;
+    color: var(--ink-muted);
+  }
+
+  /* Reminder card */
+  .reminders {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .reminder {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px;
+    border-radius: 22px;
+    cursor: pointer;
+    transition: transform 0.3s cubic-bezier(.22,1,.36,1);
+    position: relative;
+  }
+  .reminder:active { transform: scale(0.98); }
+  .reminder.mint { background: var(--mint); }
+  .reminder.cream { background: var(--cream); }
+  .reminder.blush { background: var(--blush); }
+  .reminder.lav { background: var(--lavender-2); }
+  .reminder.done { opacity: 0.5; }
+  .reminder.done .r-title { text-decoration: line-through; }
+  .time-chip {
+    width: 52px; height: 52px;
+    background: var(--white);
+    border-radius: 14px;
+    display: grid;
+    place-items: center;
+    flex: 0 0 auto;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 11px;
+    color: var(--ink);
+    text-align: center;
+    line-height: 1.1;
+  }
+  .time-chip small { font-size: 9px; color: var(--ink-muted); font-weight: 500; }
+  .r-body { flex: 1; min-width: 0; }
+  .r-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 15px;
+    line-height: 1.2;
+    color: var(--ink);
+  }
+  .r-sub {
+    font-size: 11px;
+    color: var(--ink-muted);
+    margin-top: 2px;
+  }
+  .r-arrow {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: var(--ink);
+    color: var(--sun);
+    display: grid; place-items: center;
+    font-size: 14px;
+    flex: 0 0 auto;
+  }
+
+  /* Big black hero card */
+  .hero-card {
+    background: var(--ink);
+    color: var(--cream);
+    border-radius: 28px;
+    padding: 20px 22px;
+    margin-top: 16px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-card .h-eye {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: rgba(245,233,200,0.6);
+  }
+  .hero-card h3 {
+    margin: 6px 0 0;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+  }
+  .hero-card i {
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    font-weight: 400;
+  }
+  .hero-card .sparkle {
+    position: absolute; right: 16px; top: 16px;
+    color: var(--sun);
+    font-size: 22px;
+  }
+
+  /* Tab bar */
+  .tabbar {
+    position: absolute;
+    bottom: 18px; left: 18px; right: 18px;
+    background: var(--ink);
+    border-radius: 999px;
+    padding: 10px 10px;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    z-index: 6;
+    box-shadow: 0 20px 40px -20px rgba(22,15,34,0.5);
+  }
+  .tab {
+    background: transparent;
+    border: 0;
+    color: rgba(245,233,200,0.6);
+    padding: 10px 14px;
+    border-radius: 999px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+    font-size: 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.3s ease;
+  }
+  .tab svg { width: 16px; height: 16px; }
+  .tab.active {
+    background: var(--sun);
+    color: var(--ink);
+  }
+  .tab:not(.active):active { background: rgba(255,255,255,0.08); }
+
+  /* Header row */
+  .head-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 6px;
+  }
+  .avatar {
+    width: 40px; height: 40px;
+    background: var(--ink);
+    color: var(--sun);
+    border-radius: 50%;
+    display: grid; place-items: center;
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    font-size: 22px;
+  }
+  .bell {
+    width: 40px; height: 40px;
+    background: var(--lavender-2);
+    border-radius: 50%;
+    display: grid; place-items: center;
+    font-size: 18px;
+    position: relative;
+  }
+  .bell::after {
+    content: ''; position: absolute;
+    top: 10px; right: 10px;
+    width: 8px; height: 8px;
+    background: var(--sun);
+    border-radius: 50%;
+    border: 2px solid var(--lavender-2);
+  }
+
+  /* Back button */
+  .back-btn {
+    width: 40px; height: 40px;
+    background: var(--lavender-2);
+    border-radius: 50%;
+    border: 0;
+    display: grid; place-items: center;
+    font-size: 18px;
+    color: var(--ink);
+    cursor: pointer;
+  }
+
+  /* Detail screen */
+  .detail-top {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 20px;
+  }
+  .detail-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 32px;
+    letter-spacing: -0.03em;
+    line-height: 1.05;
+    margin-top: 12px;
+  }
+  .detail-time {
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    font-size: 20px;
+    color: var(--ink-muted);
+    margin-top: 4px;
+  }
+  .detail-card {
+    background: var(--mint);
+    border-radius: 24px;
+    padding: 22px;
+    margin-top: 18px;
+  }
+  .detail-card .label {
+    font-size: 10px; font-weight: 600;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--ink-muted);
+  }
+  .detail-card .note {
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    font-size: 18px;
+    margin-top: 6px;
+    color: var(--ink);
+  }
+  .detail-row {
+    display: flex;
+    gap: 10px;
+    margin-top: 16px;
+  }
+  .big-btn {
+    flex: 1;
+    padding: 16px;
+    border-radius: 20px;
+    border: 0;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+  }
+  .big-btn:active { transform: scale(0.97); }
+  .big-btn.primary { background: var(--ink); color: var(--white); }
+  .big-btn.secondary { background: var(--white); color: var(--ink); border: 1.5px solid var(--ink); }
+
+  /* Add screen */
+  .add-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 32px;
+    letter-spacing: -0.03em;
+    line-height: 1.05;
+    margin-top: 18px;
+  }
+  .add-title i { font-family: 'Instrument Serif', serif; font-weight: 400; font-style: italic; color: var(--ink-soft); }
+  .add-input {
+    margin-top: 20px;
+    background: var(--lavender);
+    border: 2px solid var(--lavender-3);
+    border-radius: 22px;
+    padding: 22px;
+    min-height: 140px;
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    font-size: 20px;
+    color: var(--ink);
+    resize: none;
+    width: 100%;
+    outline: none;
+    transition: border 0.3s ease;
+  }
+  .add-input:focus { border-color: var(--ink); }
+  .add-input::placeholder { color: var(--ink-muted); }
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 16px;
+  }
+  .chip {
+    background: var(--white);
+    border: 1.5px solid var(--ink);
+    border-radius: 999px;
+    padding: 10px 16px;
+    font-size: 12px;
+    font-weight: 600;
+    font-family: 'Space Grotesk', sans-serif;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .chip:hover, .chip.active { background: var(--ink); color: var(--white); }
+
+  .save-btn {
+    margin-top: 22px;
+    width: 100%;
+    background: var(--ink);
+    color: var(--white);
+    border: 0;
+    padding: 18px;
+    border-radius: 999px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 15px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: transform 0.2s ease;
+  }
+  .save-btn:active { transform: scale(0.98); }
+  .save-btn .sun { color: var(--sun); }
+
+  /* Together screen */
+  .together-head {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-top: 6px;
+  }
+  .together-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 32px;
+    letter-spacing: -0.03em;
+    line-height: 1.05;
+    margin-top: 14px;
+  }
+  .together-title i { font-family: 'Instrument Serif', serif; font-weight: 400; font-style: italic; color: var(--ink-soft); }
+
+  .person-card {
+    background: var(--white);
+    border: 1.5px solid rgba(22,15,34,0.08);
+    border-radius: 22px;
+    padding: 18px;
+    margin-top: 14px;
+    display: flex;
+    gap: 14px;
+    align-items: center;
+    box-shadow: 0 10px 30px -20px rgba(22,15,34,0.2);
+  }
+  .person-avatar {
+    width: 56px; height: 56px;
+    border-radius: 50%;
+    display: grid; place-items: center;
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    font-size: 26px;
+    color: var(--ink);
+    flex: 0 0 auto;
+  }
+  .person-avatar.mint { background: var(--mint); }
+  .person-avatar.cream { background: var(--cream); }
+  .person-avatar.blush { background: var(--blush); }
+  .person-body { flex: 1; min-width: 0; }
+  .person-name {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+  }
+  .person-status {
+    font-size: 11px;
+    color: var(--ink-muted);
+    margin-top: 2px;
+  }
+  .status-dot {
+    display: inline-block;
+    width: 8px; height: 8px;
+    background: #4BA572;
+    border-radius: 50%;
+    margin-right: 5px;
+    vertical-align: middle;
+  }
+
+  .invite-btn {
+    margin-top: 16px;
+    width: 100%;
+    background: var(--lavender-2);
+    border: 2px dashed var(--lavender-line);
+    border-radius: 22px;
+    padding: 18px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--ink-soft);
+    cursor: pointer;
+  }
+
+  .together-feed {
+    margin-top: 22px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+  }
+  .feed-item {
+    margin-top: 10px;
+    padding: 14px 16px;
+    background: var(--lavender);
+    border-radius: 18px;
+    font-size: 13px;
+  }
+  .feed-item b {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+  }
+  .feed-item .t {
+    display: block;
+    font-size: 10px;
+    color: var(--ink-muted);
+    margin-top: 3px;
+  }
+
+  /* Welcome overlay */
+  .welcome {
+    position: absolute; inset: 0;
+    background: var(--lavender-3);
+    z-index: 50;
+    padding: 60px 32px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+  .welcome.hidden {
+    opacity: 0;
+    transform: translateY(-20px);
+    pointer-events: none;
+  }
+  .welcome h1 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 56px;
+    line-height: 0.95;
+    letter-spacing: -0.04em;
+    margin: 0;
+  }
+  .welcome h1 i {
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    font-weight: 400;
+    display: block;
+    color: var(--ink-soft);
+  }
+  .welcome p {
+    font-size: 16px;
+    color: var(--ink-soft);
+    margin-top: 14px;
+    line-height: 1.5;
+    max-width: 300px;
+  }
+  .welcome .logo {
+    width: 64px; height: 64px;
+    background: var(--ink);
+    color: var(--sun);
+    border-radius: 50%;
+    display: grid; place-items: center;
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    font-size: 38px;
+    margin-bottom: 28px;
+  }
+  .welcome .start {
+    background: var(--ink);
+    color: var(--white);
+    border: 0;
+    padding: 20px;
+    border-radius: 999px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 15px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+  }
+  .welcome .w-sparkle {
+    position: absolute; top: 80px; right: 60px;
+    color: var(--ink);
+    font-size: 28px;
+    animation: twinkle 2.4s ease-in-out infinite;
+  }
+  .welcome .w-sparkle.two { top: auto; right: auto; bottom: 200px; left: 50px; font-size: 20px; animation-delay: 1s; }
+
+  @keyframes twinkle {
+    0%, 100% { transform: rotate(0deg) scale(1); opacity: 0.7; }
+    50% { transform: rotate(12deg) scale(1.2); opacity: 1; }
+  }
+
+  /* Scribble underline */
+  .scribble {
+    display: inline;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 12'><path d='M2,8 Q50,2 100,6 T198,5' stroke='%23F5C842' stroke-width='4' fill='none' stroke-linecap='round'/></svg>");
+    background-repeat: no-repeat;
+    background-position: 0 100%;
+    background-size: 100% 0.4em;
+  }
+
+  /* Help hint */
+  .hint {
+    position: fixed;
+    bottom: 20px; left: 50%;
+    transform: translateX(-50%);
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    font-size: 13px;
+    color: var(--ink-muted);
+    z-index: 10;
+    pointer-events: none;
+    text-align: center;
+    background: rgba(255,255,255,0.6);
+    padding: 8px 16px;
+    border-radius: 999px;
+    backdrop-filter: blur(8px);
+  }
+
+  /* Bottom sheet modal */
+  .sheet-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(22,15,34,0.5);
+    backdrop-filter: blur(4px);
+    z-index: 40;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s ease;
+  }
+  .sheet-backdrop.open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .sheet {
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    background: var(--white);
+    border-radius: 32px 32px 0 0;
+    padding: 28px 24px 30px;
+    z-index: 41;
+    transform: translateY(100%);
+    transition: transform 0.5s cubic-bezier(.22,1,.36,1);
+    max-height: 82%;
+    overflow-y: auto;
+    box-shadow: 0 -30px 60px -30px rgba(22,15,34,0.4);
+    scrollbar-width: none;
+  }
+  .sheet::-webkit-scrollbar { display: none; }
+  .sheet.open { transform: translateY(0); }
+  .sheet-handle {
+    width: 44px; height: 5px;
+    background: var(--lavender-3);
+    border-radius: 999px;
+    margin: 0 auto 18px;
+  }
+  .sheet h2 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 26px;
+    letter-spacing: -0.02em;
+    margin: 0;
+    line-height: 1.05;
+  }
+  .sheet h2 i { font-family: 'Instrument Serif', serif; font-weight: 400; font-style: italic; color: var(--ink-soft); }
+  .sheet p {
+    font-size: 14px;
+    color: var(--ink-muted);
+    line-height: 1.5;
+    margin: 8px 0 0;
+  }
+  .sheet-input {
+    width: 100%;
+    background: var(--lavender);
+    border: 2px solid var(--lavender-3);
+    border-radius: 16px;
+    padding: 14px 16px;
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    color: var(--ink);
+    outline: none;
+    margin-top: 14px;
+  }
+  .sheet-input:focus { border-color: var(--ink); }
+  .sheet-btn {
+    width: 100%;
+    background: var(--ink);
+    color: var(--white);
+    border: 0;
+    padding: 16px;
+    border-radius: 999px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    cursor: pointer;
+    margin-top: 14px;
+  }
+  .sheet-btn.secondary {
+    background: var(--lavender-2);
+    color: var(--ink);
+    border: 1px solid var(--lavender-3);
+  }
+  .sheet-btn:active { transform: scale(0.98); }
+  .toggle-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 0;
+    border-bottom: 1px solid rgba(22,15,34,0.08);
+  }
+  .toggle-row:last-child { border-bottom: 0; }
+  .toggle-row .lbl {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+  }
+  .toggle-row .hint {
+    display: block;
+    font-size: 11px;
+    font-weight: 400;
+    font-family: 'Inter', sans-serif;
+    color: var(--ink-muted);
+    margin-top: 2px;
+    position: static;
+    background: none;
+    padding: 0;
+    backdrop-filter: none;
+    transform: none;
+    white-space: normal;
+    left: auto;
+    bottom: auto;
+    z-index: auto;
+    pointer-events: auto;
+    max-width: 100%;
+  }
+  .switch {
+    width: 44px; height: 26px;
+    background: var(--lavender-3);
+    border-radius: 999px;
+    position: relative;
+    cursor: pointer;
+    flex: 0 0 auto;
+    transition: background 0.3s ease;
+  }
+  .switch::after {
+    content: '';
+    position: absolute;
+    top: 3px; left: 3px;
+    width: 20px; height: 20px;
+    background: var(--white);
+    border-radius: 50%;
+    transition: left 0.3s cubic-bezier(.22,1,.36,1);
+    box-shadow: 0 2px 6px rgba(22,15,34,0.2);
+  }
+  .switch.on { background: var(--ink); }
+  .switch.on::after { left: 21px; }
+
+  /* Group work */
+  .group-sub {
+    font-size: 12px;
+    color: var(--ink-muted);
+    margin: 4px 0 10px;
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+  }
+  .group-card {
+    background: var(--white);
+    border: 1.5px solid rgba(22,15,34,0.08);
+    border-radius: 24px;
+    padding: 18px;
+    margin-top: 12px;
+    cursor: pointer;
+    transition: transform 0.25s cubic-bezier(.22,1,.36,1);
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 10px 30px -20px rgba(22,15,34,0.2);
+  }
+  .group-card:active { transform: scale(0.985); }
+  .group-card.dark { background: var(--ink); color: var(--cream); border-color: transparent; }
+  .group-card.dark .g-title { color: var(--cream); }
+  .group-card.dark .g-title i { color: rgba(245,233,200,0.7); }
+  .group-card.dark .g-eye, .group-card.dark .g-meta { color: rgba(245,233,200,0.6); }
+  .group-card.dark .g-meta b { color: var(--cream); }
+  .group-card.dark .g-progress-wrap { background: rgba(245,233,200,0.15); }
+  .group-card.dark .g-progress { background: var(--sun); }
+  .group-card .g-eye {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+  }
+  .group-card .g-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 19px;
+    line-height: 1.15;
+    margin-top: 4px;
+    color: var(--ink);
+  }
+  .group-card .g-title i {
+    font-family: 'Instrument Serif', serif;
+    font-weight: 400;
+    font-style: italic;
+    color: var(--ink-soft);
+  }
+  .group-card .g-members {
+    display: flex;
+    align-items: center;
+    margin-top: 14px;
+  }
+  .g-dot {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    border: 2px solid var(--white);
+    display: grid; place-items: center;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 11px;
+    color: var(--ink);
+    margin-left: -8px;
+  }
+  .g-dot:first-child { margin-left: 0; }
+  .g-dot.mint { background: var(--mint); }
+  .g-dot.cream { background: var(--cream); }
+  .g-dot.blush { background: var(--blush); }
+  .g-dot.lav { background: var(--lavender-2); }
+  .group-card.dark .g-dot { border-color: var(--ink); }
+  .g-progress-wrap {
+    margin-top: 14px;
+    height: 8px;
+    background: var(--lavender);
+    border-radius: 999px;
+    overflow: hidden;
+  }
+  .g-progress {
+    height: 100%;
+    background: var(--ink);
+    border-radius: 999px;
+    transition: width 0.5s cubic-bezier(.22,1,.36,1);
+  }
+  .g-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 10px;
+    font-size: 11px;
+    color: var(--ink-muted);
+  }
+  .g-meta b {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    color: var(--ink);
+  }
+  .g-badge {
+    background: var(--sun);
+    color: var(--ink);
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 10px;
+    letter-spacing: 0.04em;
+  }
+
+  /* Group sheet task row */
+  .task-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(22,15,34,0.08);
+    cursor: pointer;
+  }
+  .task-row:last-child { border-bottom: 0; }
+  .task-check {
+    width: 24px; height: 24px;
+    border-radius: 8px;
+    border: 2px solid var(--ink);
+    display: grid; place-items: center;
+    font-size: 14px;
+    color: transparent;
+    transition: all 0.2s ease;
+    flex: 0 0 auto;
+  }
+  .task-check.done {
+    background: var(--ink);
+    color: var(--sun);
+  }
+  .task-row.done .task-body { opacity: 0.5; }
+  .task-row.done .task-title { text-decoration: line-through; }
+  .task-body { flex: 1; min-width: 0; }
+  .task-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+  }
+  .task-who {
+    font-size: 10px;
+    color: var(--ink-muted);
+    margin-top: 2px;
+  }
+
+  /* Time picker */
+  .time-picker {
+    display: flex;
+    gap: 8px;
+    margin-top: 14px;
+  }
+  .time-picker select,
+  .time-picker input {
+    flex: 1;
+    background: var(--lavender);
+    border: 2px solid var(--lavender-3);
+    border-radius: 14px;
+    padding: 12px 14px;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    color: var(--ink);
+    outline: none;
+  }
+  .time-picker select:focus,
+  .time-picker input:focus { border-color: var(--ink); }
+  .days-row {
+    display: flex;
+    gap: 6px;
+    margin-top: 12px;
+    flex-wrap: wrap;
+  }
+  .day-chip {
+    width: 38px; height: 38px;
+    border-radius: 50%;
+    border: 1.5px solid var(--ink);
+    display: grid; place-items: center;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 12px;
+    cursor: pointer;
+    background: var(--white);
+    color: var(--ink);
+    transition: all 0.2s ease;
+  }
+  .day-chip.active {
+    background: var(--ink);
+    color: var(--white);
+  }
+
+  .notif-item {
+    display: flex;
+    gap: 12px;
+    padding: 14px 0;
+    border-bottom: 1px solid rgba(22,15,34,0.08);
+  }
+  .notif-item:last-child { border-bottom: 0; }
+  .notif-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    margin-top: 6px;
+    flex: 0 0 auto;
+  }
+  .notif-body .t {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+    font-size: 13px;
+    line-height: 1.3;
+  }
+  .notif-body .s {
+    font-size: 11px;
+    color: var(--ink-muted);
+    margin-top: 2px;
+  }
+
+  .toast {
+    position: absolute;
+    top: 60px; left: 50%;
+    transform: translate(-50%, -20px);
+    background: var(--ink);
+    color: var(--cream);
+    padding: 12px 20px;
+    border-radius: 999px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+    font-size: 12px;
+    z-index: 60;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s ease, transform 0.4s ease;
+    box-shadow: 0 20px 40px -20px rgba(22,15,34,0.5);
+    white-space: nowrap;
+  }
+  .toast.show {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+  .toast .sun { color: var(--sun); margin-left: 6px; }
+
+  @media (max-width: 500px) {
+    body { padding: 0; align-items: stretch; }
+    .phone {
+      width: 100vw;
+      max-width: 100vw;
+      height: 100svh;
+      max-height: 100svh;
+      border-radius: 0;
+      border: 0;
+    }
+    .stage-label { display: none; }
+    .hint { display: none; }
+    .bg-squiggle { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- desktop bg squiggles -->
+<svg class="bg-squiggle one" width="300" height="80" viewBox="0 0 300 80" fill="none">
+  <path d="M2,40 Q40,2 80,40 T160,40 T240,40 T298,30" stroke="#9A86B8" stroke-width="3" stroke-linecap="round"/>
+</svg>
+<svg class="bg-squiggle two" width="280" height="80" viewBox="0 0 280 80" fill="none">
+  <path d="M2,50 C40,10 80,80 120,40 S200,10 278,50" stroke="#B99FD4" stroke-width="3" stroke-linecap="round"/>
+</svg>
+<svg class="bg-squiggle three" width="240" height="70" viewBox="0 0 240 70" fill="none">
+  <path d="M2,30 Q60,60 120,20 T238,30" stroke="#9A86B8" stroke-width="3" stroke-linecap="round"/>
+</svg>
+
+<div class="stage">
+  <div class="stage-label"><b>Butler</b> &nbsp;·&nbsp; clickable preview</div>
+
+  <div class="phone" id="phone">
+    <div class="notch"></div>
+
+    <!-- Welcome overlay -->
+    <div class="welcome" id="welcome">
+      <div class="w-sparkle">✦</div>
+      <div class="w-sparkle two">✦</div>
+      <div>
+        <div class="logo">B</div>
+        <h1>Hi.<br/><i>I&rsquo;m Butler.</i></h1>
+        <p>A little helper for the things you&rsquo;d rather not forget. I&rsquo;ll remember so you don&rsquo;t have to.</p>
+      </div>
+      <button class="start" onclick="dismissWelcome()">
+        Let&rsquo;s begin <span style="color:var(--sun)">✦</span>
+      </button>
+    </div>
+
+    <div class="statusbar">
+      <span>9:41</span>
+      <span class="icons">●●● ●</span>
+    </div>
+
+    <div class="screens" id="screens">
+
+      <!-- HOME -->
+      <div class="screen active" data-screen="home">
+        <div class="head-row">
+          <div class="avatar" onclick="openSheet('profile')" role="button">B</div>
+          <div class="bell" onclick="openSheet('notifications')" role="button">🔔</div>
+        </div>
+        <div style="margin-top:18px">
+          <div class="greeting-eyebrow">Tuesday · April 5</div>
+          <div class="greeting-title">Hi, Tato. <i>Three small things today.</i></div>
+          <div class="greeting-sub">Nothing urgent right now. You&rsquo;re ahead.</div>
+        </div>
+
+        <div class="reminders" id="remindersList"></div>
+
+        <div class="hero-card" onclick="openSheet('pharmacy')">
+          <div class="sparkle">✦</div>
+          <div class="h-eye">Butler&rsquo;s note</div>
+          <h3>Your pharmacy is open until 8 tonight. <i>No rush.</i></h3>
+        </div>
+
+        <div style="height:30px"></div>
+      </div>
+
+      <!-- DETAIL -->
+      <div class="screen" data-screen="detail">
+        <button class="back-btn" onclick="go('home')">←</button>
+        <div class="detail-top"></div>
+        <div class="greeting-eyebrow" id="detail-eyebrow">At 10:00 AM</div>
+        <div class="detail-title" id="detail-title">Morning pills</div>
+        <div class="detail-time" id="detail-time">in about 12 minutes</div>
+
+        <div class="detail-card" id="detail-card">
+          <div class="label">Butler is holding this for you</div>
+          <div class="note" id="detail-note">&ldquo;The blue ones, with a full glass of water. You said the last batch was harsh on your stomach — take it after your toast.&rdquo;</div>
+        </div>
+
+        <div style="margin-top:18px">
+          <div class="label" style="font-size:10px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink-muted)">Reaches you by</div>
+          <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+            <div class="chip active">Phone</div>
+            <div class="chip active">Text</div>
+            <div class="chip">Email</div>
+          </div>
+        </div>
+
+        <div class="detail-row">
+          <button class="big-btn primary" onclick="markDone()">Mark done ✓</button>
+          <button class="big-btn secondary" onclick="snoozeReminder()">Snooze 10m</button>
+        </div>
+
+        <div style="margin-top:26px" class="together-feed">Shared with</div>
+        <div class="feed-item">
+          <b>Maria (daughter)</b> can see this one.
+          <span class="t">You turned this on last week.</span>
+        </div>
+      </div>
+
+      <!-- ADD -->
+      <div class="screen" data-screen="add">
+        <button class="back-btn" onclick="go('home')">←</button>
+        <div class="add-title">What should Butler <i>remember?</i></div>
+        <textarea class="add-input" placeholder="Tell me, plainly. I&rsquo;ll take it from here."></textarea>
+
+        <div class="chips">
+          <div class="chip" onclick="toggleChip(this)">Medication</div>
+          <div class="chip" onclick="toggleChip(this)">Appointment</div>
+          <div class="chip" onclick="toggleChip(this)">Call someone</div>
+          <div class="chip" onclick="toggleChip(this)">A birthday</div>
+          <div class="chip" onclick="toggleChip(this)">Something else</div>
+        </div>
+
+        <div style="margin-top:22px">
+          <div class="label" style="font-size:10px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink-muted)">When?</div>
+          <div class="chips" style="margin-top:10px">
+            <div class="chip" onclick="toggleChip(this)">Once</div>
+            <div class="chip active" onclick="toggleChip(this)">Every morning</div>
+            <div class="chip" onclick="toggleChip(this)">Every week</div>
+            <div class="chip" id="customWhenChip" onclick="openSheet('customWhen')" style="border-style:dashed">Custom… ✦</div>
+          </div>
+        </div>
+
+        <button class="save-btn" onclick="saveReminder()">
+          I&rsquo;ve got it <span class="sun">✦</span>
+        </button>
+      </div>
+
+      <!-- TOGETHER -->
+      <div class="screen" data-screen="together">
+        <div class="together-head">
+          <div class="avatar" onclick="openSheet('profile')" role="button">B</div>
+          <div class="bell" onclick="openSheet('notifications')" role="button">👥</div>
+        </div>
+        <div class="greeting-eyebrow" style="margin-top:18px">Together</div>
+        <div class="together-title">The people who <i>love you.</i></div>
+
+        <div id="peopleList"></div>
+
+        <button class="invite-btn" onclick="openSheet('invite')">+ Invite someone you trust</button>
+
+        <div class="together-feed" style="margin-top:26px">Group work</div>
+        <div class="group-sub">Shared tasks with friends. Everyone pitches in, Butler keeps score.</div>
+        <div id="groupList"></div>
+        <button class="invite-btn" style="margin-top:10px" onclick="openSheet('newGroup')">+ Start a new group</button>
+
+        <div class="together-feed">Quiet updates</div>
+        <div id="feedList"></div>
+      </div>
+
+    </div>
+
+    <!-- Bottom sheet system -->
+    <div class="sheet-backdrop" id="sheetBackdrop" onclick="closeSheet()"></div>
+    <div class="sheet" id="sheet">
+      <div class="sheet-handle"></div>
+      <div id="sheetContent"></div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+    <div class="tabbar">
+      <button class="tab active" data-tab="home" onclick="go('home')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11 L12 3 L21 11 V20 A1 1 0 0 1 20 21 H15 V14 H9 V21 H4 A1 1 0 0 1 3 20 Z"/></svg>
+        Today
+      </button>
+      <button class="tab" data-tab="add" onclick="go('add')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M7 12h10"/></svg>
+        Add
+      </button>
+      <button class="tab" data-tab="together" onclick="go('together')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="9" r="3.5"/><circle cx="17" cy="10" r="2.8"/><path d="M2.5 20c0-3.3 2.9-6 6.5-6s6.5 2.7 6.5 6"/><path d="M15 20c.3-2.5 2-4.5 4.5-5"/></svg>
+        Together
+      </button>
+    </div>
+  </div>
+
+  <div class="stage-label" style="max-width:390px;text-align:center">
+    Tap anything. It&rsquo;s clickable. Use the tab bar to move between <b>Today</b>, <b>Add</b>, and <b>Together</b>.
+  </div>
+</div>
+
+<div class="hint">Press <b>esc</b> to see the welcome again · click a reminder to open it</div>
+
+<script>
+/* ---------- State ---------- */
+const state = {
+  reminders: [
+    { id: 'pills',  time: '10:00', ampm: 'AM', title: 'Morning pills',        sub: 'The blue ones, with water', color: 'mint',  when: 'At 10:00 AM', relative: 'in about 12 minutes', note: '&ldquo;The blue ones, with a full glass of water. You said the last batch was harsh on your stomach — take it after your toast.&rdquo;', sharedWith: ['Maria'], done: false },
+    { id: 'doctor', time: '2:30',  ampm: 'PM', title: 'Dr. Reyes — checkup',  sub: 'Bring the blue folder',      color: 'cream', when: 'At 2:30 PM',  relative: 'this afternoon',       note: '&ldquo;Bring the blue folder. Maria offered to come with you — she said to text her by noon if you&rsquo;d like a ride.&rdquo;',                  sharedWith: ['Maria'], done: false },
+    { id: 'call',   time: '6:15',  ampm: 'PM', title: 'Call your daughter',   sub: 'It&rsquo;s her Tuesday',      color: 'blush', when: 'At 6:15 PM',  relative: 'this evening',         note: '&ldquo;It&rsquo;s her Tuesday. She mentioned the kids have a school thing this week — ask her how it went.&rdquo;',                                     sharedWith: [],       done: false },
+  ],
+  people: [
+    { id: 'maria', name: 'Maria', initial: 'M', relation: 'Your daughter',  color: 'mint',  seeing: 4, share: { medication: true,  appointments: true,  calls: true,  location: false } },
+    { id: 'joel',  name: 'Joel',  initial: 'J', relation: 'Your neighbor',  color: 'cream', seeing: 1, share: { medication: false, appointments: false, calls: true,  location: false } },
+  ],
+  feed: [
+    { who: 'Maria',  text: 'saw your morning pill reminder at 10:03 AM.',                    t: '10 minutes ago',  color: '#4BA572' },
+    { who: 'You',    text: 'snoozed Dr. Reyes to tomorrow. Maria was notified, at your request.', t: 'Yesterday, 4:11 PM', color: '#B99FD4' },
+    { who: 'Butler', text: 'checked in. Everything on track.',                                 t: 'Yesterday, morning',  color: '#F5C842' },
+  ],
+  notifications: [
+    { color: '#F5C842', title: 'Dr. Reyes is in 10 minutes', sub: 'Bring the blue folder.' },
+    { color: '#4BA572', title: 'Maria saw your morning pills', sub: '10 minutes ago' },
+    { color: '#B99FD4', title: 'Butler is holding 3 things for you today', sub: 'Nothing urgent right now.' },
+  ],
+  groups: [
+    {
+      id: 'birthday',
+      eyebrow: 'This Saturday',
+      title: "Dad's 80th birthday",
+      titleI: "party",
+      members: [ { i: 'M', c: 'mint' }, { i: 'J', c: 'cream' }, { i: 'A', c: 'blush' }, { i: 'R', c: 'lav' } ],
+      memberNames: 'Maria, Joel, Ana, Rico',
+      dark: true,
+      tasks: [
+        { id: 't1', title: 'Book the restaurant',       who: 'Maria',  done: true  },
+        { id: 't2', title: 'Pick up the cake',          who: 'Joel',   done: true  },
+        { id: 't3', title: 'Make the playlist',         who: 'Ana',    done: false },
+        { id: 't4', title: 'Print photos for the wall', who: 'Rico',   done: false },
+        { id: 't5', title: 'Call cousin Elena',         who: 'You',    done: false },
+      ],
+    },
+    {
+      id: 'hike',
+      eyebrow: 'Sunday, 7 AM',
+      title: "Weekend hike",
+      titleI: "with Joel",
+      members: [ { i: 'J', c: 'cream' }, { i: 'T', c: 'mint' } ],
+      memberNames: 'Joel, you',
+      dark: false,
+      tasks: [
+        { id: 'h1', title: 'Pack water & snacks', who: 'You',  done: false },
+        { id: 'h2', title: 'Bring the map',       who: 'Joel', done: false },
+        { id: 'h3', title: 'Check the weather',   who: 'You',  done: true  },
+      ],
+    },
+  ],
+  currentDetail: null,
+  currentGroup: null,
+  customWhen: null, // set by the custom-when sheet
+};
+
+/* ---------- Render ---------- */
+function renderReminders() {
+  const list = document.getElementById('remindersList');
+  list.innerHTML = '';
+  state.reminders.forEach(r => {
+    const el = document.createElement('div');
+    el.className = 'reminder ' + r.color + (r.done ? ' done' : '');
+    el.onclick = () => openDetail(r.id);
+    el.innerHTML = `
+      <div class="time-chip">${r.time}<br/><small>${r.ampm}</small></div>
+      <div class="r-body">
+        <div class="r-title">${r.title}</div>
+        <div class="r-sub">${r.sub}</div>
+      </div>
+      <div class="r-arrow">→</div>
+    `;
+    list.appendChild(el);
+  });
+
+  // Update greeting count
+  const greeting = document.querySelector('.greeting-title');
+  if (greeting) {
+    const remaining = state.reminders.filter(r => !r.done).length;
+    const word = remaining === 0 ? 'Nothing left' : remaining === 1 ? 'One small thing' : (remaining === 2 ? 'Two small things' : remaining === 3 ? 'Three small things' : remaining + ' things');
+    greeting.innerHTML = `Hi, Tato. <i>${word} today.</i>`;
+  }
+}
+
+function renderPeople() {
+  const list = document.getElementById('peopleList');
+  if (!list) return;
+  list.innerHTML = '';
+  state.people.forEach(p => {
+    const el = document.createElement('div');
+    el.className = 'person-card';
+    el.style.cursor = 'pointer';
+    el.onclick = () => openSheet('person', p.id);
+    el.innerHTML = `
+      <div class="person-avatar ${p.color}">${p.initial}</div>
+      <div class="person-body">
+        <div class="person-name">${p.name}</div>
+        <div class="person-status"><span class="status-dot"></span>${p.relation} · sees ${p.seeing} thing${p.seeing !== 1 ? 's' : ''}</div>
+      </div>
+      <div class="r-arrow" style="background:var(--lavender-2);color:var(--ink)">→</div>
+    `;
+    list.appendChild(el);
+  });
+}
+
+function renderFeed() {
+  const list = document.getElementById('feedList');
+  if (!list) return;
+  list.innerHTML = '';
+  state.feed.forEach((f, i) => {
+    const el = document.createElement('div');
+    el.className = 'feed-item';
+    el.style.cursor = 'pointer';
+    el.onclick = () => toast(`Butler is holding the full story. ✦`);
+    el.innerHTML = `<b>${f.who}</b> ${f.text}<span class="t">${f.t}</span>`;
+    list.appendChild(el);
+  });
+}
+
+function renderGroups() {
+  const list = document.getElementById('groupList');
+  if (!list) return;
+  list.innerHTML = '';
+  state.groups.forEach(g => {
+    const done = g.tasks.filter(t => t.done).length;
+    const total = g.tasks.length;
+    const pct = total === 0 ? 0 : Math.round((done / total) * 100);
+    const el = document.createElement('div');
+    el.className = 'group-card' + (g.dark ? ' dark' : '');
+    el.onclick = () => openSheet('group', g.id);
+    el.innerHTML = `
+      <div class="g-head">
+        <div>
+          <div class="g-eye">${g.eyebrow}</div>
+          <div class="g-title">${g.title} <i>${g.titleI}</i></div>
+        </div>
+        ${pct === 100 ? '<div class="g-badge">DONE ✦</div>' : ''}
+      </div>
+      <div class="g-members">
+        ${g.members.map(m => `<div class="g-dot ${m.c}">${m.i}</div>`).join('')}
+      </div>
+      <div class="g-progress-wrap"><div class="g-progress" style="width:${pct}%"></div></div>
+      <div class="g-meta">
+        <span><b>${done}</b> of ${total} done</span>
+        <span>${g.memberNames}</span>
+      </div>
+    `;
+    list.appendChild(el);
+  });
+}
+
+function renderAll() {
+  renderReminders();
+  renderPeople();
+  renderFeed();
+  renderGroups();
+}
+
+/* ---------- Screen nav ---------- */
+const tabs = document.querySelectorAll('.tab');
+let navLock = false;
+function go(name) {
+  if (navLock) return;
+  const current = document.querySelector('.screen.active');
+  if (current && current.dataset.screen === name) return;
+  const next = document.querySelector(`.screen[data-screen="${name}"]`);
+  if (!next) return;
+
+  navLock = true;
+  // Prep next screen offscreen-ish, no transition
+  next.scrollTop = 0;
+
+  if (current) current.classList.remove('active');
+  next.classList.add('active');
+
+  // Clean up any stale leaving class after transition
+  setTimeout(() => { navLock = false; }, 240);
+
+  const tabName = ['home','add','together'].includes(name) ? name : 'home';
+  tabs.forEach(t => t.classList.toggle('active', t.dataset.tab === tabName));
+}
+
+/* ---------- Detail ---------- */
+function openDetail(id) {
+  const r = state.reminders.find(x => x.id === id);
+  if (!r) return;
+  state.currentDetail = id;
+  document.getElementById('detail-eyebrow').textContent = r.when;
+  document.getElementById('detail-title').textContent = r.title;
+  document.getElementById('detail-time').textContent = r.done ? 'done · nicely handled' : r.relative;
+  document.getElementById('detail-note').innerHTML = r.note;
+  document.getElementById('detail-card').style.background =
+    r.color === 'mint' ? 'var(--mint)' :
+    r.color === 'cream' ? 'var(--cream)' :
+    r.color === 'blush' ? 'var(--blush)' : 'var(--lavender-2)';
+  go('detail');
+}
+
+function markDone() {
+  const id = state.currentDetail;
+  if (!id) return;
+  const r = state.reminders.find(x => x.id === id);
+  if (r) r.done = true;
+  toast("Butler&rsquo;s got it ✓");
+  renderAll();
+  setTimeout(() => go('home'), 650);
+}
+
+function snoozeReminder() {
+  const id = state.currentDetail;
+  if (!id) return;
+  const r = state.reminders.find(x => x.id === id);
+  if (!r) return;
+  // bump by 10 minutes visually
+  let [h, m] = r.time.split(':').map(Number);
+  m += 10;
+  if (m >= 60) { m -= 60; h += 1; }
+  r.time = `${h}:${m.toString().padStart(2,'0')}`;
+  r.relative = 'snoozed — 10 minutes later';
+  toast('Snoozed 10 minutes ✦');
+  renderAll();
+  setTimeout(() => go('home'), 650);
+}
+
+/* ---------- Add ---------- */
+function toggleChip(el) {
+  // single-select for "when" group, multi for others — look at parent
+  const parent = el.parentElement;
+  const groupLabel = parent.previousElementSibling;
+  const isWhen = groupLabel && groupLabel.textContent && groupLabel.textContent.toLowerCase().includes('when');
+  if (isWhen) {
+    parent.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+    // also clear any stored custom schedule + reset the custom chip label
+    state.customWhen = null;
+    const customChip = document.getElementById('customWhenChip');
+    if (customChip) customChip.innerHTML = 'Custom… ✦';
+  }
+  el.classList.toggle('active');
+}
+
+function saveReminder() {
+  const textarea = document.querySelector('#add-screen-input') || document.querySelector('[data-screen="add"] .add-input');
+  const text = (textarea && textarea.value || '').trim();
+  if (!text) {
+    toast('Tell me what to remember ✦');
+    if (textarea) textarea.focus();
+    return;
+  }
+  const colors = ['lav','mint','cream','blush'];
+  const nextColor = colors[state.reminders.length % colors.length];
+  // pull selected category chip as sub
+  const catChips = document.querySelectorAll('[data-screen="add"] .chips:first-of-type .chip.active');
+  const catSub = catChips.length ? Array.from(catChips).map(c => c.textContent).join(' · ') : '';
+
+  // Figure out time + schedule summary (custom wins if set)
+  let time, ampm, whenLabel, relative, scheduleSub;
+  if (state.customWhen) {
+    const cw = state.customWhen;
+    time = `${cw.hour}:${cw.minute}`;
+    ampm = cw.ampm;
+    const daysSummary = cw.days.length === 0 ? 'Once' :
+      cw.days.length === 7 ? 'every day' :
+      cw.days.length === 5 && ['mon','tue','wed','thu','fri'].every(d => cw.days.includes(d)) ? 'weekdays' :
+      cw.days.length === 2 && cw.days.includes('sat') && cw.days.includes('sun') ? 'weekends' :
+      cw.days.join(', ');
+    whenLabel = `At ${time} ${ampm} — ${daysSummary}`;
+    relative = `custom schedule`;
+    scheduleSub = daysSummary;
+  } else {
+    const now = new Date();
+    const hh = ((now.getHours() + 1) % 24);
+    time = (hh % 12 === 0 ? 12 : hh % 12) + ':00';
+    ampm = hh >= 12 ? 'PM' : 'AM';
+    whenLabel = `At ${time} ${ampm}`;
+    relative = 'in about an hour';
+    scheduleSub = '';
+  }
+
+  const sub = [catSub, scheduleSub].filter(Boolean).join(' · ') || 'Butler is holding it for you';
+
+  const id = 'r' + Date.now();
+  state.reminders.push({
+    id, time, ampm,
+    title: text.length > 32 ? text.slice(0,30) + '…' : text,
+    sub, color: nextColor,
+    when: whenLabel, relative,
+    note: '&ldquo;' + text + '&rdquo;', sharedWith: [], done: false
+  });
+  if (textarea) textarea.value = '';
+  // reset custom schedule for next add
+  state.customWhen = null;
+  const customChip = document.getElementById('customWhenChip');
+  if (customChip) customChip.innerHTML = 'Custom… ✦';
+  renderAll();
+  toast('Got it. I&rsquo;ll remember. ✦');
+  setTimeout(() => go('home'), 700);
+}
+
+/* ---------- Welcome ---------- */
+function dismissWelcome() {
+  document.getElementById('welcome').classList.add('hidden');
+}
+
+/* ---------- Toast ---------- */
+let toastTimer;
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.innerHTML = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+/* ---------- Bottom sheets ---------- */
+function openSheet(kind, arg) {
+  const sheet = document.getElementById('sheet');
+  const backdrop = document.getElementById('sheetBackdrop');
+  const content = document.getElementById('sheetContent');
+  content.innerHTML = sheetContent(kind, arg);
+  backdrop.classList.add('open');
+  sheet.classList.add('open');
+  // wire inner elements after insertion
+  wireSheet(kind, arg);
+}
+function closeSheet() {
+  document.getElementById('sheet').classList.remove('open');
+  document.getElementById('sheetBackdrop').classList.remove('open');
+}
+
+function sheetContent(kind, arg) {
+  if (kind === 'profile') {
+    return `
+      <h2>Hi, <i>Tato.</i></h2>
+      <p>You&rsquo;ve been with Butler for 14 days. Everything is on track.</p>
+      <div style="margin-top:18px">
+        <div class="toggle-row">
+          <div><div class="lbl">Notifications</div><span class="hint">Phone · Text · Email</span></div>
+          <div class="switch on" onclick="this.classList.toggle('on'); toast('Saved ✦')"></div>
+        </div>
+        <div class="toggle-row">
+          <div><div class="lbl">Quiet hours</div><span class="hint">10 PM – 7 AM</span></div>
+          <div class="switch on" onclick="this.classList.toggle('on'); toast('Saved ✦')"></div>
+        </div>
+        <div class="toggle-row">
+          <div><div class="lbl">Big text</div><span class="hint">Easier to read</span></div>
+          <div class="switch" onclick="this.classList.toggle('on'); toast('Saved ✦')"></div>
+        </div>
+      </div>
+      <button class="sheet-btn" onclick="toast('All changes saved ✦'); closeSheet()">Done</button>
+      <button class="sheet-btn secondary" onclick="document.getElementById('welcome').classList.remove('hidden'); closeSheet()">Show the welcome screen again</button>
+    `;
+  }
+  if (kind === 'notifications') {
+    return `
+      <h2>What&rsquo;s <i>happening.</i></h2>
+      <p>Quiet, helpful updates — nothing loud.</p>
+      <div style="margin-top:18px">
+        ${state.notifications.map(n => `
+          <div class="notif-item">
+            <div class="notif-dot" style="background:${n.color}"></div>
+            <div class="notif-body"><div class="t">${n.title}</div><div class="s">${n.sub}</div></div>
+          </div>
+        `).join('')}
+      </div>
+      <button class="sheet-btn" onclick="toast('Cleared ✦'); state.notifications = []; closeSheet()">Mark all as read</button>
+    `;
+  }
+  if (kind === 'pharmacy') {
+    return `
+      <h2>Your <i>pharmacy.</i></h2>
+      <p>Corner of Oak and 5th. Open until 8 PM tonight. No rush — Butler will remind you if you&rsquo;re running low.</p>
+      <button class="sheet-btn" onclick="toast('Directions ready ✦'); closeSheet()">Get directions</button>
+      <button class="sheet-btn secondary" onclick="toast('Butler will call ahead ✦'); closeSheet()">Ask Butler to call ahead</button>
+    `;
+  }
+  if (kind === 'person') {
+    const p = state.people.find(x => x.id === arg);
+    if (!p) return '';
+    return `
+      <h2>${p.name}</h2>
+      <p>${p.relation}. You decide what ${p.name} sees. Change anything, any time.</p>
+      <div style="margin-top:18px">
+        <div class="toggle-row">
+          <div><div class="lbl">Medication reminders</div><span class="hint">So ${p.name} can help</span></div>
+          <div class="switch ${p.share.medication ? 'on' : ''}" data-key="medication" onclick="toggleShare('${p.id}', 'medication', this)"></div>
+        </div>
+        <div class="toggle-row">
+          <div><div class="lbl">Appointments</div><span class="hint">Doctor, dentist, etc.</span></div>
+          <div class="switch ${p.share.appointments ? 'on' : ''}" data-key="appointments" onclick="toggleShare('${p.id}', 'appointments', this)"></div>
+        </div>
+        <div class="toggle-row">
+          <div><div class="lbl">Family calls</div><span class="hint">Birthdays and check-ins</span></div>
+          <div class="switch ${p.share.calls ? 'on' : ''}" data-key="calls" onclick="toggleShare('${p.id}', 'calls', this)"></div>
+        </div>
+        <div class="toggle-row">
+          <div><div class="lbl">Location</div><span class="hint">Never on by default</span></div>
+          <div class="switch ${p.share.location ? 'on' : ''}" data-key="location" onclick="toggleShare('${p.id}', 'location', this)"></div>
+        </div>
+      </div>
+      <button class="sheet-btn" onclick="toast('Saved for ${p.name} ✦'); closeSheet()">Done</button>
+      <button class="sheet-btn secondary" onclick="removePerson('${p.id}')">Pause sharing with ${p.name}</button>
+    `;
+  }
+  if (kind === 'group') {
+    const g = state.groups.find(x => x.id === arg);
+    if (!g) return '';
+    const done = g.tasks.filter(t => t.done).length;
+    const total = g.tasks.length;
+    const pct = total === 0 ? 0 : Math.round((done / total) * 100);
+    return `
+      <div class="g-eye">${g.eyebrow}</div>
+      <h2 style="margin-top:4px">${g.title} <i>${g.titleI}</i></h2>
+      <p>With ${g.memberNames}. Everyone pitches in — Butler keeps score.</p>
+
+      <div class="g-members" style="margin-top:14px">
+        ${g.members.map(m => `<div class="g-dot ${m.c}">${m.i}</div>`).join('')}
+      </div>
+      <div class="g-progress-wrap" style="margin-top:14px"><div class="g-progress" style="width:${pct}%"></div></div>
+      <div class="g-meta"><span><b>${done}</b> of ${total} done</span><span>${pct}%</span></div>
+
+      <div style="margin-top:18px">
+        ${g.tasks.map(t => `
+          <div class="task-row ${t.done ? 'done' : ''}" onclick="toggleTask('${g.id}', '${t.id}')">
+            <div class="task-check ${t.done ? 'done' : ''}">✓</div>
+            <div class="task-body">
+              <div class="task-title">${t.title}</div>
+              <div class="task-who">${t.who}</div>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+
+      <input class="sheet-input" id="newTaskInput" placeholder="+ Add something to the list" />
+      <button class="sheet-btn" onclick="addGroupTask('${g.id}')">Add it ✦</button>
+      <button class="sheet-btn secondary" onclick="closeSheet()">Done</button>
+    `;
+  }
+  if (kind === 'newGroup') {
+    return `
+      <h2>Start a <i>group.</i></h2>
+      <p>Give it a name. Invite people. Share the work — Butler keeps everyone in sync.</p>
+      <input class="sheet-input" id="newGroupName" placeholder="Like &ldquo;Weekend hike&rdquo; or &ldquo;Mom&rsquo;s party&rdquo;" />
+      <input class="sheet-input" id="newGroupWhen" placeholder="When? (optional)" />
+      <input class="sheet-input" id="newGroupWith" placeholder="With whom? (comma-separated names)" />
+      <button class="sheet-btn" onclick="createGroup()">Start the group ✦</button>
+      <button class="sheet-btn secondary" onclick="closeSheet()">Not now</button>
+    `;
+  }
+  if (kind === 'customWhen') {
+    const cw = state.customWhen || { hour: '7', minute: '00', ampm: 'AM', days: [] };
+    const days = ['M','T','W','T','F','S','S'];
+    const dayKeys = ['mon','tue','wed','thu','fri','sat','sun'];
+    const hours = Array.from({length:12}, (_,i) => i+1);
+    const mins  = ['00','15','30','45'];
+    return `
+      <h2>Custom <i>schedule.</i></h2>
+      <p>Pick the time and days. Butler will nudge you exactly then — not a minute earlier, not a minute later.</p>
+
+      <div class="time-picker">
+        <select id="cwHour">${hours.map(h => `<option ${String(h)===String(cw.hour)?'selected':''}>${h}</option>`).join('')}</select>
+        <select id="cwMinute">${mins.map(m => `<option ${m===cw.minute?'selected':''}>${m}</option>`).join('')}</select>
+        <select id="cwAmPm">
+          <option ${cw.ampm==='AM'?'selected':''}>AM</option>
+          <option ${cw.ampm==='PM'?'selected':''}>PM</option>
+        </select>
+      </div>
+
+      <div style="margin-top:16px">
+        <div class="g-eye">Repeat on</div>
+        <div class="days-row">
+          ${days.map((d, i) => `
+            <div class="day-chip ${cw.days.includes(dayKeys[i]) ? 'active' : ''}" data-day="${dayKeys[i]}" onclick="this.classList.toggle('active')">${d}</div>
+          `).join('')}
+        </div>
+      </div>
+
+      <input class="sheet-input" id="cwLabel" placeholder="What should I remember?" value="${(cw.label||'').replace(/"/g,'&quot;')}" />
+
+      <button class="sheet-btn" onclick="saveCustomWhen()">Use this schedule ✦</button>
+      <button class="sheet-btn secondary" onclick="closeSheet()">Cancel</button>
+    `;
+  }
+  if (kind === 'invite') {
+    return `
+      <h2>Invite someone <i>you trust.</i></h2>
+      <p>They&rsquo;ll get a friendly note. You stay in charge of everything they can see.</p>
+      <input class="sheet-input" id="inviteName" placeholder="Their name — like &ldquo;Maria&rdquo;" />
+      <input class="sheet-input" id="inviteRelation" placeholder="Who they are — like &ldquo;my son&rdquo;" />
+      <button class="sheet-btn" onclick="sendInvite()">Send the invite ✦</button>
+      <button class="sheet-btn secondary" onclick="closeSheet()">Not now</button>
+    `;
+  }
+  return '';
+}
+
+function wireSheet(kind, arg) { /* hooks are inline — nothing extra needed for now */ }
+
+function toggleShare(personId, key, el) {
+  const p = state.people.find(x => x.id === personId);
+  if (!p) return;
+  p.share[key] = !p.share[key];
+  el.classList.toggle('on');
+  p.seeing = Object.values(p.share).filter(Boolean).length;
+  renderPeople();
+  toast(`${p.name} ${p.share[key] ? 'now sees' : 'no longer sees'} ${key} ✦`);
+}
+
+function removePerson(personId) {
+  const idx = state.people.findIndex(x => x.id === personId);
+  if (idx < 0) return;
+  const name = state.people[idx].name;
+  state.people.splice(idx, 1);
+  renderPeople();
+  toast(`Sharing with ${name} paused ✦`);
+  closeSheet();
+}
+
+function toggleTask(groupId, taskId) {
+  const g = state.groups.find(x => x.id === groupId);
+  if (!g) return;
+  const t = g.tasks.find(x => x.id === taskId);
+  if (!t) return;
+  t.done = !t.done;
+  renderGroups();
+  // re-render just this sheet's content (lightweight: just refresh rows)
+  const content = document.getElementById('sheetContent');
+  if (content) content.innerHTML = sheetContent('group', groupId);
+  if (t.done) toast(`${t.title} — done ✦`);
+}
+
+function addGroupTask(groupId) {
+  const input = document.getElementById('newTaskInput');
+  const val = (input && input.value || '').trim();
+  if (!val) { toast('Type a task first ✦'); return; }
+  const g = state.groups.find(x => x.id === groupId);
+  if (!g) return;
+  g.tasks.push({ id: 'g' + Date.now(), title: val, who: 'You', done: false });
+  renderGroups();
+  document.getElementById('sheetContent').innerHTML = sheetContent('group', groupId);
+  toast('Added to the list ✦');
+}
+
+function createGroup() {
+  const name = document.getElementById('newGroupName').value.trim();
+  const when = document.getElementById('newGroupWhen').value.trim();
+  const withWhom = document.getElementById('newGroupWith').value.trim();
+  if (!name) { toast('Give it a name ✦'); return; }
+  const names = withWhom ? withWhom.split(',').map(s => s.trim()).filter(Boolean) : [];
+  const colors = ['mint','cream','blush','lav'];
+  const members = [{ i: 'T', c: 'mint' }, ...names.map((n, i) => ({ i: n[0].toUpperCase(), c: colors[(i+1) % colors.length] }))];
+  state.groups.unshift({
+    id: 'g' + Date.now(),
+    eyebrow: when || 'Soon',
+    title: name,
+    titleI: '',
+    members,
+    memberNames: names.length ? 'you, ' + names.join(', ') : 'just you',
+    dark: false,
+    tasks: [],
+  });
+  state.feed.unshift({ who: 'You', text: `started a new group: ${name}.`, t: 'just now' });
+  renderAll();
+  toast('Group started ✦');
+  closeSheet();
+}
+
+function saveCustomWhen() {
+  const hour = document.getElementById('cwHour').value;
+  const minute = document.getElementById('cwMinute').value;
+  const ampm = document.getElementById('cwAmPm').value;
+  const label = document.getElementById('cwLabel').value.trim();
+  const days = Array.from(document.querySelectorAll('.day-chip.active')).map(el => el.dataset.day);
+  state.customWhen = { hour, minute, ampm, days, label };
+
+  // Mark the "Custom" chip as active in the Add screen When group
+  document.querySelectorAll('[data-screen="add"] .chips').forEach((grp, idx) => {
+    // 2nd chips group is the When row
+  });
+  const customChip = document.getElementById('customWhenChip');
+  if (customChip) {
+    // deselect siblings, select custom
+    const parent = customChip.parentElement;
+    parent.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+    customChip.classList.add('active');
+    const daysSummary = days.length === 0 ? 'Once' :
+      days.length === 7 ? 'Every day' :
+      days.length === 5 && ['mon','tue','wed','thu','fri'].every(d => days.includes(d)) ? 'Weekdays' :
+      days.length + ' days/week';
+    customChip.innerHTML = `${hour}:${minute} ${ampm} · ${daysSummary} ✦`;
+  }
+  toast('Schedule saved ✦');
+  closeSheet();
+}
+
+function sendInvite() {
+  const name = document.getElementById('inviteName').value.trim();
+  const rel = document.getElementById('inviteRelation').value.trim();
+  if (!name) { toast('A name, please ✦'); return; }
+  const initials = name[0].toUpperCase();
+  const colors = ['mint','cream','blush'];
+  state.people.push({
+    id: 'p' + Date.now(),
+    name,
+    initial: initials,
+    relation: rel || 'Someone you trust',
+    color: colors[state.people.length % colors.length],
+    seeing: 0,
+    share: { medication: false, appointments: false, calls: false, location: false }
+  });
+  state.feed.unshift({ who: 'You', text: `invited ${name} to share your Butler.`, t: 'just now' });
+  renderAll();
+  toast(`Invite sent to ${name} ✦`);
+  closeSheet();
+}
+
+/* ---------- Boot ---------- */
+// Give the add-screen input a stable id so saveReminder can find it reliably
+document.querySelector('[data-screen="add"] .add-input').id = 'add-screen-input';
+
+renderAll();
+
+// ESC: close sheet, else reopen welcome
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    const sheet = document.getElementById('sheet');
+    if (sheet.classList.contains('open')) {
+      closeSheet();
+    } else {
+      document.getElementById('welcome').classList.remove('hidden');
+    }
+  }
+});
+</script>
+</body>
+</html>
