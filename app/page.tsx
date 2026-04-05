@@ -3,6 +3,8 @@
 import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useLanguage } from "@/lib/i18n";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
@@ -72,6 +74,16 @@ function Star({
 
 export default function Home() {
   const rootRef = useRef<HTMLDivElement>(null);
+  const { t, locale } = useLanguage();
+
+  // Keep the browser tab title in sync with the active language. The server
+  // rendered <title> is English (for SEO); this updates it on the client
+  // once the user's language is known.
+  useEffect(() => {
+    if (typeof document !== "undefined") {
+      document.title = t("meta.title");
+    }
+  }, [t, locale]);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -282,26 +294,32 @@ export default function Home() {
       <nav className="nav fixed top-0 left-0 right-0 z-50 transition-all duration-300">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-6 md:px-10">
           <a href="#top" className="flex items-center gap-2">
-            <div className="h-9 w-9 rounded-full bg-ink text-sun grid place-items-center font-display text-2xl italic">
-              B
-            </div>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/butler-mark.png"
+              alt="Butler"
+              className="h-9 w-9 rounded-full"
+            />
             <span className="font-chunky text-xl font-bold tracking-tight text-ink">
               Butler
             </span>
           </a>
           <div className="hidden items-center gap-8 md:flex">
-            <a href="#story" className="text-sm text-ink/70 hover:text-ink">The story</a>
-            <a href="#how" className="text-sm text-ink/70 hover:text-ink">How it works</a>
-            <a href="#together" className="text-sm text-ink/70 hover:text-ink">Together</a>
-            <a href="#pricing" className="text-sm text-ink/70 hover:text-ink">Pricing</a>
+            <a href="#story" className="text-sm text-ink/70 hover:text-ink">{t("nav.story")}</a>
+            <a href="#how" className="text-sm text-ink/70 hover:text-ink">{t("nav.how")}</a>
+            <a href="#together" className="text-sm text-ink/70 hover:text-ink">{t("nav.together")}</a>
+            <a href="#pricing" className="text-sm text-ink/70 hover:text-ink">{t("nav.pricing")}</a>
           </div>
-          <a
-            href="/app"
-            className="magnetic inline-flex items-center gap-2 rounded-full bg-ink px-5 py-3 text-sm font-semibold text-white transition hover:bg-ink-soft"
-          >
-            Open Butler
-            <span aria-hidden>→</span>
-          </a>
+          <div className="flex items-center gap-3">
+            <LanguageSwitcher />
+            <a
+              href="/app"
+              className="magnetic inline-flex items-center gap-2 rounded-full bg-ink px-5 py-3 text-sm font-semibold text-white transition hover:bg-ink-soft"
+            >
+              {t("nav.cta")}
+              <span aria-hidden>→</span>
+            </a>
+          </div>
         </div>
       </nav>
 
@@ -336,36 +354,34 @@ export default function Home() {
           <div className="md:col-span-7">
             <div className="hero-eyebrow mb-6 inline-flex items-center gap-3 rounded-full border border-ink/15 bg-white/60 px-4 py-2 text-xs font-medium uppercase tracking-wider text-ink/70 backdrop-blur">
               <span className="h-1.5 w-1.5 rounded-full bg-sun" />
-              A little helper, arriving soon
+              {t("hero.eyebrow")}
             </div>
             <h1 className="font-chunky text-[clamp(2.6rem,7.2vw,6.4rem)] font-bold leading-[0.95] tracking-tightest text-ink">
               <div>
-                <span className="hero-word word"><span>Butler</span></span>{" "}
-                <span className="hero-word word"><span>remembers.</span></span>
+                <span className="hero-word word"><span>{t("hero.title.butler")}</span></span>{" "}
+                <span className="hero-word word"><span>{t("hero.title.remembers")}</span></span>
               </div>
               <div className="mt-2 font-display italic font-normal text-ink-soft">
-                <span className="hero-word word"><span>So</span></span>{" "}
-                <span className="hero-word word"><span>you</span></span>{" "}
-                <span className="hero-word word"><span>don&rsquo;t</span></span>{" "}
-                <span className="hero-word word"><span>have</span></span>{" "}
-                <span className="hero-word word"><span>to.</span></span>
+                <span className="hero-word word"><span>{t("hero.title.so")}</span></span>{" "}
+                <span className="hero-word word"><span>{t("hero.title.you")}</span></span>{" "}
+                <span className="hero-word word"><span>{t("hero.title.dont")}</span></span>{" "}
+                <span className="hero-word word"><span>{t("hero.title.have")}</span></span>{" "}
+                <span className="hero-word word"><span>{t("hero.title.to")}</span></span>
               </div>
             </h1>
             <p className="hero-sub mt-8 max-w-xl text-lg leading-relaxed text-ink/70 md:text-xl">
-              A little helper for the things you&rsquo;d rather not forget — from
-              your morning pills to your daughter&rsquo;s birthday. Butler keeps
-              it all, quietly, and nudges you at exactly the right moment.
+              {t("hero.subtitle")}
             </p>
             <div className="hero-cta mt-10 flex flex-wrap items-center gap-4">
               <a
                 href="/app"
                 className="magnetic group inline-flex items-center gap-3 rounded-full bg-ink px-8 py-5 text-base font-semibold text-white shadow-[0_20px_40px_-20px_rgba(22,15,34,0.45)] transition hover:bg-ink-soft"
               >
-                Open Butler
+                {t("hero.cta.primary")}
                 <span className="inline-block transition-transform group-hover:translate-x-1">→</span>
               </a>
               <a href="#story" className="text-sm font-medium text-ink/70 underline-offset-4 hover:text-ink hover:underline">
-                or meet Tato first
+                {t("hero.cta.secondary")}
               </a>
             </div>
 
@@ -375,7 +391,7 @@ export default function Home() {
                 <div className="h-8 w-8 rounded-full border-2 border-lavender-100 bg-cream" />
                 <div className="h-8 w-8 rounded-full border-2 border-lavender-100 bg-blush" />
               </div>
-              <span>Quietly helping people remember the things that matter.</span>
+              <span>{t("hero.socialProof")}</span>
             </div>
           </div>
 
@@ -388,12 +404,12 @@ export default function Home() {
               <div className="card-shadow rotate-[-6deg] rounded-3xl bg-cream p-5 w-56">
                 <div className="flex items-center gap-2 text-xs font-semibold text-ink/70">
                   <span className="h-2 w-2 rounded-full bg-sun" />
-                  IN 10 MINUTES
+                  {t("hero.phoneCard.tag")}
                 </div>
                 <p className="mt-2 font-chunky text-lg leading-tight text-ink">
-                  Take the blue pills with water
+                  {t("hero.phoneCard.title")}
                 </p>
-                <p className="mt-1 text-xs text-ink/60">Butler&rsquo;s been holding this for you.</p>
+                <p className="mt-1 text-xs text-ink/60">{t("hero.phoneCard.sub")}</p>
               </div>
             </div>
           </div>
@@ -405,11 +421,11 @@ export default function Home() {
         <div className="marquee-track flex w-max whitespace-nowrap py-5 text-xl font-display italic">
           {Array.from({ length: 8 }).map((_, i) => (
             <span key={i} className="mx-8 inline-flex items-center gap-8">
-              remember the small things
+              {t("marquee.a")}
               <span className="text-sun">✦</span>
-              be there for the people who love you
+              {t("marquee.b")}
               <span className="text-sun">✦</span>
-              never miss the appointment that matters
+              {t("marquee.c")}
               <span className="text-sun">✦</span>
             </span>
           ))}
@@ -428,11 +444,11 @@ export default function Home() {
         <div className="mx-auto max-w-7xl px-6 md:px-10">
           <div className="reveal mx-auto max-w-3xl text-center">
             <div className="mb-4 text-xs font-semibold uppercase tracking-widest text-ink/50">
-              What Butler does
+              {t("how.eyebrow")}
             </div>
             <h2 className="font-chunky text-5xl font-bold leading-[1] tracking-tightest text-ink md:text-7xl">
-              Four small jobs, <br />
-              <span className="font-display italic font-normal">done perfectly.</span>
+              {t("how.title.1")} <br />
+              <span className="font-display italic font-normal">{t("how.title.2")}</span>
             </h2>
           </div>
 
@@ -440,29 +456,29 @@ export default function Home() {
             <FeatureCard
               bg="bg-mint"
               tag="01"
-              title="Remembers the small things"
-              body="Tell Butler once. Butler holds it — the pharmacy hours, the name of that nurse, the story you loved last Tuesday."
+              title={t("how.feature1.title")}
+              body={t("how.feature1.body")}
               icon={<BrainIcon />}
             />
             <FeatureCard
               bg="bg-cream"
               tag="02"
-              title="Reminds you at the right moment"
-              body="A gentle nudge by phone, email, and text — with confirmation it actually arrived. No missed appointments. Ever."
+              title={t("how.feature2.title")}
+              body={t("how.feature2.body")}
               icon={<BellIcon />}
             />
             <FeatureCard
               bg="bg-blush"
               tag="03"
-              title="Helps the people who love you"
-              body="Share Butler with one person you trust — or a whole family. They can help without hovering."
+              title={t("how.feature3.title")}
+              body={t("how.feature3.body")}
               icon={<HeartIcon />}
             />
             <FeatureCard
               bg="bg-ink text-cream"
               tag="04"
-              title="Stays out of the way"
-              body="Butler never asks more than it needs. It never guesses. It doesn't track your every move. It just shows up when it matters."
+              title={t("how.feature4.title")}
+              body={t("how.feature4.body")}
               icon={<LeafIcon color="#F5C842" />}
               dark
             />
@@ -493,47 +509,33 @@ export default function Home() {
                 <PortraitIllustration />
                 <div className="mt-4 flex items-center justify-between">
                   <div>
-                    <div className="font-chunky text-lg font-bold text-ink">Tato</div>
-                    <div className="text-xs text-ink/60">78, lives next door to JRP</div>
+                    <div className="font-chunky text-lg font-bold text-ink">{t("tato.portrait.name")}</div>
+                    <div className="text-xs text-ink/60">{t("tato.portrait.caption")}</div>
                   </div>
                   <div className="text-2xl">✦</div>
                 </div>
               </div>
               <div className="absolute -top-4 -right-4 rotate-6 rounded-2xl bg-sun px-4 py-2 font-chunky text-sm font-bold text-ink">
-                meet the reason
+                {t("tato.portrait.badge")}
               </div>
             </div>
           </div>
 
           <div className="reveal md:col-span-7">
             <div className="mb-4 text-xs font-semibold uppercase tracking-widest text-ink/50">
-              The story
+              {t("tato.eyebrow")}
             </div>
             <h2 className="font-chunky text-5xl font-bold leading-[1] tracking-tightest text-ink md:text-6xl">
-              Built for Tato. <br />
-              <span className="font-display italic font-normal">And for you.</span>
+              {t("tato.title.1")} <br />
+              <span className="font-display italic font-normal">{t("tato.title.2")}</span>
             </h2>
             <div className="mt-8 space-y-5 text-lg leading-relaxed text-ink/80">
-              <p>
-                Tato is JRP&rsquo;s neighbor. He&rsquo;s 78. He has a daughter
-                who loves him, a lot of prescriptions, and a calendar full of
-                appointments he didn&rsquo;t ask for.
-              </p>
-              <p>
-                He&rsquo;s also sharp, kind, and very ready to tell you when
-                something feels like too much. The existing apps on his phone
-                felt like too much. He deleted them.
-              </p>
+              <p>{t("tato.body.1")}</p>
+              <p>{t("tato.body.2")}</p>
               <p className="relative rounded-2xl border-l-4 border-sun bg-white/60 p-6 font-display text-xl italic text-ink">
-                &ldquo;I just want someone to remind me, quietly, when it&rsquo;s
-                time. And I want my daughter to know I&rsquo;m okay without
-                her having to call me every day.&rdquo;
+                {"\u201C"}{t("tato.quote")}{"\u201D"}
               </p>
-              <p>
-                We built Butler for Tato. Which means we built it for anyone
-                who wants a little help remembering the things that matter —
-                and for the people who love them.
-              </p>
+              <p>{t("tato.body.3")}</p>
             </div>
           </div>
         </div>
@@ -546,16 +548,14 @@ export default function Home() {
         <div className="mx-auto max-w-7xl px-6 md:px-10">
           <div className="reveal mx-auto max-w-3xl text-center">
             <div className="mb-4 text-xs font-semibold uppercase tracking-widest text-ink/50">
-              Better together
+              {t("together.eyebrow")}
             </div>
             <h2 className="font-chunky text-5xl font-bold leading-[1] tracking-tightest text-ink md:text-7xl">
-              One Butler. <br />
-              <span className="font-display italic font-normal scribble-underline">The people who love you.</span>
+              {t("together.title.1")} <br />
+              <span className="font-display italic font-normal scribble-underline">{t("together.title.2")}</span>
             </h2>
             <p className="mx-auto mt-8 max-w-2xl text-lg text-ink/70">
-              Share Butler with your daughter, your son, your best friend.
-              They see what you choose to share. They help when they can. You
-              stay the one in charge — always.
+              {t("together.subtitle")}
             </p>
           </div>
 
@@ -565,7 +565,7 @@ export default function Home() {
             </div>
             <div className="flex flex-col items-center gap-3 font-display text-4xl italic text-ink/60">
               <span className="twinkle">✦</span>
-              <span>together</span>
+              <span>{t("together.word")}</span>
               <span className="twinkle">✦</span>
             </div>
             <div className="phone-float-b">
@@ -575,18 +575,9 @@ export default function Home() {
 
           <div className="reveal mt-20 grid grid-cols-1 gap-6 md:grid-cols-3">
             {[
-              {
-                title: "Tato is always in charge",
-                body: "The account is his. He decides what's shared, what's private, and can pull back access at any time with one tap.",
-              },
-              {
-                title: "His daughter helps without hovering",
-                body: "She sees his appointments, his medication reminders — only what he's chosen to share. She gets a nudge if something important was missed.",
-              },
-              {
-                title: "No one feels watched",
-                body: "Butler never narrates Tato's day. No 'he went here, he did that.' Just gentle help, from people he trusts.",
-              },
+              { title: t("together.card1.title"), body: t("together.card1.body") },
+              { title: t("together.card2.title"), body: t("together.card2.body") },
+              { title: t("together.card3.title"), body: t("together.card3.body") },
             ].map((c, i) => (
               <div
                 key={i}
@@ -619,11 +610,11 @@ export default function Home() {
         <div className="mx-auto max-w-7xl px-6 md:px-10">
           <div className="reveal mx-auto max-w-3xl text-center">
             <div className="mb-4 text-xs font-semibold uppercase tracking-widest text-ink/50">
-              Simple, like Butler
+              {t("pricing.eyebrow")}
             </div>
             <h2 className="font-chunky text-5xl font-bold leading-[1] tracking-tightest text-ink md:text-7xl">
-              Two plans. <br />
-              <span className="font-display italic font-normal">That&rsquo;s it.</span>
+              {t("pricing.title.1")} <br />
+              <span className="font-display italic font-normal">{t("pricing.title.2")}</span>
             </h2>
           </div>
 
@@ -633,28 +624,28 @@ export default function Home() {
               <div className="flex items-center justify-between">
                 <div>
                   <div className="text-xs font-semibold uppercase tracking-widest text-ink/50">
-                    Butler
+                    {t("pricing.starter.tag")}
                   </div>
                   <div className="mt-1 font-chunky text-3xl font-bold text-ink">
-                    For you
+                    {t("pricing.starter.name")}
                   </div>
                 </div>
                 <div className="rounded-full bg-mint px-4 py-2 text-xs font-semibold uppercase tracking-wider text-ink">
-                  Free
+                  {t("pricing.starter.badge")}
                 </div>
               </div>
 
               <div className="mt-8 flex items-baseline gap-2">
-                <div className="font-chunky text-6xl font-bold text-ink">$0</div>
-                <div className="text-sm text-ink/60">forever</div>
+                <div className="font-chunky text-6xl font-bold text-ink">{t("pricing.starter.price")}</div>
+                <div className="text-sm text-ink/60">{t("pricing.starter.period")}</div>
               </div>
 
               <ul className="mt-8 space-y-3 text-base text-ink/80">
                 {[
-                  "Everything Butler does",
-                  "Reliable reminders by phone, email, and text",
-                  "Room to remember the things that matter",
-                  "Quiet by design — never in your face",
+                  t("pricing.starter.f1"),
+                  t("pricing.starter.f2"),
+                  t("pricing.starter.f3"),
+                  t("pricing.starter.f4"),
                 ].map((l) => (
                   <li key={l} className="flex items-start gap-3">
                     <span className="mt-1 h-2 w-2 shrink-0 rounded-full bg-ink" />
@@ -667,44 +658,44 @@ export default function Home() {
                 href="/app"
                 className="magnetic mt-10 inline-flex w-full items-center justify-center gap-2 rounded-full border border-ink px-6 py-4 text-sm font-semibold text-ink transition hover:bg-ink hover:text-white"
               >
-                Start with Butler — it&rsquo;s free
+                {t("pricing.starter.cta")}
               </a>
             </div>
 
             {/* Pro */}
             <div className="price-card card-shadow relative rounded-[32px] bg-ink p-10 text-cream">
               <div className="absolute -top-4 left-10 rotate-[-3deg] rounded-full bg-sun px-4 py-2 font-chunky text-xs font-bold text-ink">
-                for the people who love you
+                {t("pricing.pro.ribbon")}
               </div>
 
               <div className="flex items-center justify-between">
                 <div>
                   <div className="text-xs font-semibold uppercase tracking-widest text-cream/70">
-                    Butler Pro
+                    {t("pricing.pro.tag")}
                   </div>
                   <div className="mt-1 font-chunky text-3xl font-bold">
-                    For you and yours
+                    {t("pricing.pro.name")}
                   </div>
                 </div>
                 <div className="rounded-full bg-sun px-4 py-2 text-xs font-semibold uppercase tracking-wider text-ink">
-                  $15/mo
+                  {t("pricing.pro.badge")}
                 </div>
               </div>
 
               <div className="mt-8 flex items-baseline gap-2">
-                <div className="font-chunky text-6xl font-bold">$15</div>
-                <div className="text-sm text-cream/70">/ month</div>
+                <div className="font-chunky text-6xl font-bold">{t("pricing.pro.price")}</div>
+                <div className="text-sm text-cream/70">{t("pricing.pro.period")}</div>
                 <div className="ml-3 rounded-full border border-cream/30 px-3 py-1 text-xs text-cream/80">
-                  save 33% yearly
+                  {t("pricing.pro.yearly")}
                 </div>
               </div>
 
               <ul className="mt-8 space-y-3 text-base text-cream/90">
                 {[
-                  "Everything in Butler",
-                  "Invite the people who love you — as many as you want",
-                  "More room for Butler to remember",
-                  "14 days free to try it",
+                  t("pricing.pro.f1"),
+                  t("pricing.pro.f2"),
+                  t("pricing.pro.f3"),
+                  t("pricing.pro.f4"),
                 ].map((l) => (
                   <li key={l} className="flex items-start gap-3">
                     <span className="mt-1 h-2 w-2 shrink-0 rounded-full bg-sun" />
@@ -717,14 +708,13 @@ export default function Home() {
                 href="/app"
                 className="magnetic mt-10 inline-flex w-full items-center justify-center gap-2 rounded-full bg-sun px-6 py-4 text-sm font-semibold text-ink transition hover:bg-cream"
               >
-                Try Butler Pro free for 14 days
+                {t("pricing.pro.cta")}
               </a>
             </div>
           </div>
 
           <p className="reveal mt-10 text-center text-sm text-ink/60">
-            Reminders are never paywalled. The important things stay the same
-            on every plan. That&rsquo;s a promise.
+            {t("pricing.promise")}
           </p>
         </div>
       </section>
@@ -736,18 +726,18 @@ export default function Home() {
         <div className="mx-auto max-w-6xl px-6 text-center md:px-10">
           <div className="big-wordmark">
             <h2 className="font-chunky text-[clamp(3rem,12vw,12rem)] font-bold leading-[0.85] tracking-tightest text-ink">
-              Let Butler <br />
-              <span className="font-display italic font-normal">remember.</span>
+              {t("bigcta.title.1")} <br />
+              <span className="font-display italic font-normal">{t("bigcta.title.2")}</span>
             </h2>
           </div>
           <p className="mx-auto mt-10 max-w-xl text-lg text-ink/70">
-            Two minutes to set up. Nothing to install. Your Butler is waiting.
+            {t("bigcta.body")}
           </p>
           <a
             href="/app"
             className="magnetic mt-10 inline-flex items-center gap-3 rounded-full bg-ink px-10 py-6 text-lg font-semibold text-white shadow-[0_30px_60px_-30px_rgba(22,15,34,0.5)] transition hover:bg-ink-soft"
           >
-            Open Butler
+            {t("bigcta.button")}
             <span>→</span>
           </a>
         </div>
@@ -757,24 +747,30 @@ export default function Home() {
       <footer className="border-t border-ink/10 bg-lavender-50 py-14">
         <div className="mx-auto flex max-w-7xl flex-col items-start justify-between gap-10 px-6 md:flex-row md:items-center md:px-10">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-full bg-ink text-sun grid place-items-center font-display text-2xl italic">
-              B
-            </div>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/butler-mark.png"
+              alt="Butler"
+              className="h-10 w-10 rounded-full"
+            />
             <div>
               <div className="font-chunky text-xl font-bold text-ink">Butler</div>
               <div className="text-xs text-ink/50">mybutler.pro</div>
             </div>
           </div>
           <div className="grid grid-cols-2 gap-x-12 gap-y-3 text-sm text-ink/70 md:grid-cols-3">
-            <a href="#story" className="hover:text-ink">The story</a>
-            <a href="#how" className="hover:text-ink">How it works</a>
-            <a href="#together" className="hover:text-ink">Together</a>
-            <a href="#pricing" className="hover:text-ink">Pricing</a>
-            <a href="mailto:hello@mybutler.pro" className="hover:text-ink">Say hello</a>
-            <a href="#" className="hover:text-ink">Privacy</a>
+            <a href="#story" className="hover:text-ink">{t("footer.story")}</a>
+            <a href="#how" className="hover:text-ink">{t("footer.how")}</a>
+            <a href="#together" className="hover:text-ink">{t("footer.together")}</a>
+            <a href="#pricing" className="hover:text-ink">{t("footer.pricing")}</a>
+            <a href="mailto:hello@mybutler.pro" className="hover:text-ink">{t("footer.contact")}</a>
+            <a href="#" className="hover:text-ink">{t("footer.privacy")}</a>
           </div>
-          <div className="text-xs text-ink/50">
-            Made with care by Rabbithole. <br />© {new Date().getFullYear()} Butler.
+          <div className="flex flex-col items-start gap-3 text-xs text-ink/50 md:items-end">
+            <LanguageSwitcher />
+            <div>
+              {t("footer.madeWith")} <br />© {new Date().getFullYear()} {t("footer.copyright")}
+            </div>
           </div>
         </div>
       </footer>
@@ -827,8 +823,19 @@ function FeatureCard({
 }
 
 function PhoneMockup({ tone = "default" }: { tone?: "default" | "tato" | "daughter" }) {
+  const { t } = useLanguage();
   const isTato = tone === "tato";
   const isDaughter = tone === "daughter";
+
+  const eyebrow = isDaughter ? t("phone.forDad") : t("phone.today");
+  const greeting = isDaughter
+    ? t("phone.greeting.daughter")
+    : isTato
+    ? t("phone.greeting.tato")
+    : t("phone.greeting.friend");
+  const sub = isDaughter ? t("phone.sub.daughter") : t("phone.sub.default");
+  const footerLine = isDaughter ? t("phone.footer.daughter") : t("phone.footer.default");
+
   return (
     <div className="relative">
       <div className="card-shadow relative rounded-[44px] border-[10px] border-ink bg-white p-4 w-[260px] md:w-[280px]">
@@ -842,26 +849,37 @@ function PhoneMockup({ tone = "default" }: { tone?: "default" | "tato" | "daught
 
         <div className="px-1">
           <div className="text-[11px] font-semibold uppercase tracking-widest text-ink/45">
-            {isDaughter ? "For Dad" : "Today"}
+            {eyebrow}
           </div>
           <div className="mt-1 font-chunky text-2xl font-bold leading-tight text-ink">
-            {isDaughter ? "Dad has 3 things" : "Hi, " + (isTato ? "Tato" : "friend") + " ✦"}
+            {greeting}
           </div>
-          <div className="text-xs text-ink/60">
-            {isDaughter ? "He&rsquo;s doing great today." : "Three small things today."}
-          </div>
+          <div className="text-xs text-ink/60">{sub}</div>
         </div>
 
         <div className="mt-5 space-y-3 px-1">
-          <ReminderRow color="bg-mint" time="10:00" title="Morning pills" sub="With water. You&rsquo;ve got this." />
-          <ReminderRow color="bg-cream" time="2:30" title="Dr. Reyes — checkup" sub="Bring the blue folder." />
-          <ReminderRow color="bg-blush" time="6:15" title="Call your daughter" sub="It&rsquo;s her Tuesday." />
+          <ReminderRow
+            color="bg-mint"
+            time="10:00"
+            title={t("phone.reminder1.title")}
+            sub={t("phone.reminder1.sub")}
+          />
+          <ReminderRow
+            color="bg-cream"
+            time="2:30"
+            title={t("phone.reminder2.title")}
+            sub={t("phone.reminder2.sub")}
+          />
+          <ReminderRow
+            color="bg-blush"
+            time="6:15"
+            title={t("phone.reminder3.title")}
+            sub={t("phone.reminder3.sub")}
+          />
         </div>
 
         <div className="mt-5 flex items-center justify-between rounded-full bg-ink px-4 py-3">
-          <span className="text-xs font-semibold text-cream">
-            {isDaughter ? "All quiet — Butler&rsquo;s got it" : "Butler&rsquo;s got you"}
-          </span>
+          <span className="text-xs font-semibold text-cream">{footerLine}</span>
           <span className="text-sun">✦</span>
         </div>
       </div>
@@ -869,7 +887,17 @@ function PhoneMockup({ tone = "default" }: { tone?: "default" | "tato" | "daught
   );
 }
 
-function ReminderRow({ color, time, title, sub }: { color: string; time: string; title: string; sub: string }) {
+function ReminderRow({
+  color,
+  time,
+  title,
+  sub,
+}: {
+  color: string;
+  time: string;
+  title: string;
+  sub: string;
+}) {
   return (
     <div className={`flex items-center gap-3 rounded-2xl p-3 ${color}`}>
       <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-white text-[10px] font-bold text-ink">
@@ -877,7 +905,7 @@ function ReminderRow({ color, time, title, sub }: { color: string; time: string;
       </div>
       <div className="min-w-0">
         <div className="truncate font-chunky text-sm font-bold text-ink">{title}</div>
-        <div className="truncate text-[11px] text-ink/60" dangerouslySetInnerHTML={{ __html: sub }} />
+        <div className="truncate text-[11px] text-ink/60">{sub}</div>
       </div>
     </div>
   );

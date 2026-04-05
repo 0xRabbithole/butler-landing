@@ -1,20 +1,26 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { LanguageProvider } from "@/lib/i18n";
 
+// NOTE: Metadata stays English on the server render for SEO / OG reasons —
+// the landing site is primarily discovered via English search queries, and
+// the og:title / og:description are shown outside the page where our client
+// i18n can't reach. The in-page <title> updates on the client via the
+// language switcher so the browser tab reflects the user's choice.
 export const metadata: Metadata = {
   title: "Butler — A little helper for the things you'd rather not forget",
   description:
     "Butler remembers so you don't have to — and helps the people who love you help you. From morning pills to your daughter's birthday.",
   openGraph: {
     title: "Butler",
-    description:
-      "A little helper for the things you'd rather not forget.",
+    description: "A little helper for the things you'd rather not forget.",
     url: "https://mybutler.pro",
     siteName: "Butler",
     type: "website",
   },
   icons: {
-    icon: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='14' fill='%23160F22'/><text x='16' y='22' text-anchor='middle' font-family='Georgia,serif' font-size='18' fill='%23F5C842' font-style='italic'>B</text></svg>",
+    icon: "/butler-mark.png",
+    apple: "/butler-mark.png",
   },
 };
 
@@ -24,6 +30,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
+    // lang="en" is the initial server render; the LanguageProvider updates
+    // document.documentElement.lang on the client once the user's preference
+    // is known.
     <html lang="en">
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -33,7 +42,9 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body className="paper-grain font-sans antialiased">{children}</body>
+      <body className="paper-grain font-sans antialiased">
+        <LanguageProvider>{children}</LanguageProvider>
+      </body>
     </html>
   );
 }

@@ -4,11 +4,12 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <meta name="theme-color" content="#EFE6F6" />
+<meta name="google" content="notranslate" />
 <title>Butler — MVP preview</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='14' fill='%23160F22'/><text x='16' y='22' text-anchor='middle' font-family='Georgia' font-size='18' fill='%23F5C842' font-style='italic'>B</text></svg>">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='14' fill='%23160F22'/><g fill='white'><polygon points='6.2,11 6,11.6 6,20.4 6.2,21 15,16'/><polygon points='25.8,11 26,11.6 26,20.4 25.8,21 17,16'/><polygon points='16,14.3 17.1,16 16,17.7 14.9,16'/></g></svg>">
 <style>
   :root {
     --lavender: #EFE6F6;
@@ -323,13 +324,11 @@
   }
   .avatar {
     width: 40px; height: 40px;
-    background: var(--ink);
-    color: var(--sun);
+    background: url('butler-mark.png') center/cover no-repeat;
     border-radius: 50%;
-    display: grid; place-items: center;
-    font-family: 'Instrument Serif', serif;
-    font-style: italic;
-    font-size: 22px;
+    font-size: 0;
+    color: transparent;
+    cursor: pointer;
   }
   .bell {
     width: 40px; height: 40px;
@@ -585,6 +584,42 @@
     margin-top: 3px;
   }
 
+  /* Language pill — quiet EN/ES toggle, used in welcome overlay and profile sheet */
+  .lang-pill {
+    position: absolute;
+    top: 40px; right: 32px;
+    display: inline-flex;
+    align-items: center;
+    padding: 3px;
+    background: rgba(255,255,255,0.7);
+    border: 1px solid rgba(22,15,34,0.15);
+    border-radius: 999px;
+    backdrop-filter: blur(8px);
+    z-index: 60;
+  }
+  .lang-pill button {
+    border: 0;
+    background: transparent;
+    color: rgba(22,15,34,0.55);
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    padding: 6px 12px;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .lang-pill button.active {
+    background: var(--ink);
+    color: var(--cream);
+    box-shadow: 0 2px 6px rgba(22,15,34,0.2);
+  }
+  .lang-pill.inline {
+    position: static;
+    padding: 3px;
+  }
+
   /* Welcome overlay */
   .welcome {
     position: absolute; inset: 0;
@@ -624,14 +659,11 @@
     max-width: 300px;
   }
   .welcome .logo {
-    width: 64px; height: 64px;
-    background: var(--ink);
-    color: var(--sun);
+    width: 72px; height: 72px;
+    background: url('butler-mark-512.png') center/cover no-repeat;
     border-radius: 50%;
-    display: grid; place-items: center;
-    font-family: 'Instrument Serif', serif;
-    font-style: italic;
-    font-size: 38px;
+    font-size: 0;
+    color: transparent;
     margin-bottom: 28px;
   }
   .welcome .start {
@@ -826,6 +858,246 @@
   }
   .switch.on { background: var(--ink); }
   .switch.on::after { left: 21px; }
+
+  /* Week view */
+  .week-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 8px 14px;
+    background: rgba(255,255,255,0.7);
+    border: 1px solid rgba(22,15,34,0.08);
+    border-radius: 999px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+    font-size: 12px;
+    color: var(--ink);
+    cursor: pointer;
+    transition: transform 0.2s ease, background 0.2s ease;
+  }
+  .week-btn:hover { transform: translateY(-1px); background: rgba(255,255,255,0.9); }
+  .week-btn svg { width: 16px; height: 16px; }
+
+  .week-eyebrow {
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    margin-top: 4px;
+  }
+  .week-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 30px;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+    margin-top: 4px;
+    line-height: 1.1;
+  }
+  .week-title i {
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    font-weight: 400;
+    color: var(--lavender-5);
+  }
+  .week-sub {
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    color: var(--ink-muted);
+    margin-top: 6px;
+    line-height: 1.5;
+  }
+  .week-days {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 22px;
+  }
+  .week-day {
+    background: rgba(255,255,255,0.6);
+    border-radius: 18px;
+    padding: 14px 16px;
+    border: 1px solid rgba(22,15,34,0.06);
+  }
+  .week-day.today {
+    background: var(--ink);
+    color: var(--cream);
+    border-color: var(--ink);
+  }
+  .week-day.today .wd-date,
+  .week-day.today .wd-name { color: var(--cream); }
+  .week-day.today .wd-empty { color: rgba(245,233,200,0.55); }
+  .week-day.empty { opacity: 0.65; }
+  .wd-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+  .wd-name {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    color: var(--ink);
+  }
+  .wd-date {
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--ink-muted);
+  }
+  .wd-items { display: flex; flex-direction: column; gap: 6px; }
+  .wd-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    background: rgba(255,255,255,0.7);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: transform 0.15s ease;
+  }
+  .wd-item:hover { transform: translateX(2px); }
+  .week-day.today .wd-item { background: rgba(255,255,255,0.12); }
+  .wd-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    flex: 0 0 auto;
+  }
+  .wd-dot.mint  { background: #8ac7a3; }
+  .wd-dot.cream { background: #e8c776; }
+  .wd-dot.blush { background: #e89a9a; }
+  .wd-dot.lav   { background: #b99fd4; }
+  .wd-time {
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--ink-muted);
+    min-width: 54px;
+  }
+  .week-day.today .wd-time { color: rgba(245,233,200,0.7); }
+  .wd-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+    font-size: 13px;
+    flex: 1;
+    color: inherit;
+  }
+  .wd-empty {
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    font-size: 14px;
+    color: var(--ink-muted);
+    padding: 2px 4px;
+  }
+
+  /* Things to tell (at appointments) */
+  .tell-card {
+    margin-top: 22px;
+    padding: 16px;
+    background: rgba(255,255,255,0.55);
+    border-radius: 18px;
+    border: 1px dashed rgba(22,15,34,0.18);
+  }
+  .tell-label {
+    font-family: 'Inter', sans-serif;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+  }
+  .tell-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 17px;
+    color: var(--ink);
+    margin-top: 4px;
+    line-height: 1.25;
+  }
+  .tell-title i {
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    font-weight: 400;
+    color: var(--lavender-5);
+  }
+  .tell-desc {
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    color: var(--ink-muted);
+    margin-top: 6px;
+    line-height: 1.5;
+  }
+  .tell-list { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+  .tell-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 12px;
+    background: rgba(255,255,255,0.8);
+    border-radius: 12px;
+  }
+  .tell-row .bullet {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--lavender-5);
+    margin-top: 7px;
+    flex: 0 0 auto;
+  }
+  .tell-row .body { flex: 1; }
+  .tell-row .txt {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 500;
+    font-size: 13px;
+    color: var(--ink);
+    line-height: 1.4;
+  }
+  .tell-row .meta {
+    font-family: 'Inter', sans-serif;
+    font-size: 10px;
+    color: var(--ink-muted);
+    margin-top: 2px;
+  }
+  .tell-add {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+  }
+  .tell-add input {
+    flex: 1;
+    background: rgba(255,255,255,0.9);
+    border: 1px solid rgba(22,15,34,0.1);
+    border-radius: 12px;
+    padding: 10px 12px;
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    color: var(--ink);
+    outline: none;
+  }
+  .tell-add input:focus { border-color: var(--lavender-5); }
+  .tell-add button {
+    background: var(--ink);
+    color: var(--cream);
+    border: 0;
+    border-radius: 12px;
+    padding: 10px 14px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+    font-size: 12px;
+    cursor: pointer;
+  }
+  .tell-draft-btn {
+    margin-top: 12px;
+    width: 100%;
+    padding: 12px;
+    background: var(--cream);
+    border: 1px solid rgba(22,15,34,0.1);
+    border-radius: 14px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--ink);
+    cursor: pointer;
+  }
+  .tell-draft-btn:hover { background: #f0dfa8; }
 
   /* Group work */
   .group-sub {
@@ -1105,13 +1377,18 @@
     <div class="welcome" id="welcome">
       <div class="w-sparkle">✦</div>
       <div class="w-sparkle two">✦</div>
+      <!-- Tiny language pill — the "signup" moment. One tap flips the whole app. -->
+      <div class="lang-pill" id="welcomeLangPill" role="group" aria-label="Language" translate="no">
+        <button type="button" data-lang="en" translate="no" onclick="setLocale('en')">EN</button>
+        <button type="button" data-lang="es" translate="no" onclick="setLocale('es')">ES</button>
+      </div>
       <div>
-        <div class="logo">B</div>
-        <h1>Hi.<br/><i>I&rsquo;m Butler.</i></h1>
-        <p>A little helper for the things you&rsquo;d rather not forget. I&rsquo;ll remember so you don&rsquo;t have to.</p>
+        <div class="logo" aria-label="Butler"></div>
+        <h1 data-i18n-html="welcome.h1"></h1>
+        <p data-i18n="welcome.tagline"></p>
       </div>
       <button class="start" onclick="dismissWelcome()">
-        Let&rsquo;s begin <span style="color:var(--sun)">✦</span>
+        <span data-i18n="welcome.begin"></span> <span style="color:var(--sun)">✦</span>
       </button>
     </div>
 
@@ -1125,23 +1402,39 @@
       <!-- HOME -->
       <div class="screen active" data-screen="home">
         <div class="head-row">
-          <div class="avatar" onclick="openSheet('profile')" role="button">B</div>
-          <div class="bell" onclick="openSheet('notifications')" role="button">🔔</div>
+          <div class="avatar" onclick="openSheet('profile')" role="button" aria-label="profile"></div>
+          <div style="display:flex;gap:10px;align-items:center">
+            <button class="week-btn" onclick="go('week')" aria-label="week ahead">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>
+              <span data-i18n="nav.week"></span>
+            </button>
+            <div class="bell" onclick="openSheet('notifications')" role="button">🔔</div>
+          </div>
         </div>
         <div style="margin-top:18px">
-          <div class="greeting-eyebrow">Tuesday · April 5</div>
-          <div class="greeting-title">Hi, Tato. <i>Three small things today.</i></div>
-          <div class="greeting-sub">Nothing urgent right now. You&rsquo;re ahead.</div>
+          <div class="greeting-eyebrow" data-i18n="home.date"></div>
+          <div class="greeting-title" id="greetingTitle"></div>
+          <div class="greeting-sub" data-i18n="home.sub"></div>
         </div>
 
         <div class="reminders" id="remindersList"></div>
 
         <div class="hero-card" onclick="openSheet('pharmacy')">
           <div class="sparkle">✦</div>
-          <div class="h-eye">Butler&rsquo;s note</div>
-          <h3>Your pharmacy is open until 8 tonight. <i>No rush.</i></h3>
+          <div class="h-eye" data-i18n="home.pharmacy_eye"></div>
+          <h3 data-i18n-html="home.pharmacy_h3"></h3>
         </div>
 
+        <div style="height:30px"></div>
+      </div>
+
+      <!-- WEEK -->
+      <div class="screen" data-screen="week">
+        <button class="back-btn" onclick="go('home')">←</button>
+        <div class="week-eyebrow" data-i18n="week.eyebrow"></div>
+        <div class="week-title" data-i18n-html="week.title"></div>
+        <div class="week-sub" data-i18n="week.sub"></div>
+        <div class="week-days" id="weekDays"></div>
         <div style="height:30px"></div>
       </div>
 
@@ -1154,79 +1447,89 @@
         <div class="detail-time" id="detail-time">in about 12 minutes</div>
 
         <div class="detail-card" id="detail-card">
-          <div class="label">Butler is holding this for you</div>
-          <div class="note" id="detail-note">&ldquo;The blue ones, with a full glass of water. You said the last batch was harsh on your stomach — take it after your toast.&rdquo;</div>
+          <div class="label" data-i18n="detail.holding"></div>
+          <div class="note" id="detail-note">&ldquo;The blue ones, with a full glass of water.&rdquo;</div>
         </div>
 
         <div style="margin-top:18px">
-          <div class="label" style="font-size:10px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink-muted)">Reaches you by</div>
+          <div class="label" style="font-size:10px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink-muted)" data-i18n="detail.reaches_by"></div>
           <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
-            <div class="chip active">Phone</div>
-            <div class="chip active">Text</div>
-            <div class="chip">Email</div>
+            <div class="chip active" data-i18n="detail.phone"></div>
+            <div class="chip active" data-i18n="detail.text"></div>
+            <div class="chip" data-i18n="detail.email"></div>
           </div>
         </div>
 
         <div class="detail-row">
-          <button class="big-btn primary" onclick="markDone()">Mark done ✓</button>
-          <button class="big-btn secondary" onclick="snoozeReminder()">Snooze 10m</button>
+          <button class="big-btn primary" onclick="markDone()" data-i18n="detail.mark_done"></button>
+          <button class="big-btn secondary" onclick="snoozeReminder()" data-i18n="detail.snooze"></button>
         </div>
 
-        <div style="margin-top:26px" class="together-feed">Shared with</div>
-        <div class="feed-item">
-          <b>Maria (daughter)</b> can see this one.
-          <span class="t">You turned this on last week.</span>
+        <!-- Things to tell (only shown for appointments) -->
+        <div id="tellCard" class="tell-card" style="display:none">
+          <div class="tell-label" data-i18n="detail.tell_label"></div>
+          <div class="tell-title" id="tellTitle"></div>
+          <div class="tell-desc" id="tellDesc" data-i18n="detail.tell_desc"></div>
+          <div class="tell-list" id="tellList"></div>
+          <div class="tell-add">
+            <input type="text" id="tellInput" data-i18n-placeholder="detail.tell_ph" onkeydown="if(event.key==='Enter'){event.preventDefault();addTellItem();}" />
+            <button onclick="addTellItem()" data-i18n="detail.tell_add"></button>
+          </div>
+          <button class="tell-draft-btn" onclick="draftTellMessage()" data-i18n="detail.tell_draft"></button>
         </div>
+
+        <div style="margin-top:26px" class="together-feed" data-i18n="detail.shared_with_label"></div>
+        <div class="feed-item" id="detailSharedLine"></div>
       </div>
 
       <!-- ADD -->
       <div class="screen" data-screen="add">
         <button class="back-btn" onclick="go('home')">←</button>
-        <div class="add-title">What should Butler <i>remember?</i></div>
-        <textarea class="add-input" placeholder="Tell me, plainly. I&rsquo;ll take it from here."></textarea>
+        <div class="add-title" data-i18n-html="add.title"></div>
+        <textarea class="add-input" data-i18n-placeholder="add.ph"></textarea>
 
         <div class="chips">
-          <div class="chip" onclick="toggleChip(this)">Medication</div>
-          <div class="chip" onclick="toggleChip(this)">Appointment</div>
-          <div class="chip" onclick="toggleChip(this)">Call someone</div>
-          <div class="chip" onclick="toggleChip(this)">A birthday</div>
-          <div class="chip" onclick="toggleChip(this)">Something else</div>
+          <div class="chip" onclick="toggleChip(this)" data-i18n="add.cat_med"></div>
+          <div class="chip" onclick="toggleChip(this)" data-i18n="add.cat_appt"></div>
+          <div class="chip" onclick="toggleChip(this)" data-i18n="add.cat_call"></div>
+          <div class="chip" onclick="toggleChip(this)" data-i18n="add.cat_bday"></div>
+          <div class="chip" onclick="toggleChip(this)" data-i18n="add.cat_other"></div>
         </div>
 
         <div style="margin-top:22px">
-          <div class="label" style="font-size:10px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink-muted)">When?</div>
+          <div class="label" style="font-size:10px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink-muted)" data-i18n="add.when_label"></div>
           <div class="chips" style="margin-top:10px">
-            <div class="chip" onclick="toggleChip(this)">Once</div>
-            <div class="chip active" onclick="toggleChip(this)">Every morning</div>
-            <div class="chip" onclick="toggleChip(this)">Every week</div>
-            <div class="chip" id="customWhenChip" onclick="openSheet('customWhen')" style="border-style:dashed">Custom… ✦</div>
+            <div class="chip" onclick="toggleChip(this)" data-i18n="add.once"></div>
+            <div class="chip active" onclick="toggleChip(this)" data-i18n="add.every_morn"></div>
+            <div class="chip" onclick="toggleChip(this)" data-i18n="add.every_week"></div>
+            <div class="chip" id="customWhenChip" onclick="openSheet('customWhen')" style="border-style:dashed" data-i18n="add.custom"></div>
           </div>
         </div>
 
         <button class="save-btn" onclick="saveReminder()">
-          I&rsquo;ve got it <span class="sun">✦</span>
+          <span data-i18n="add.save"></span> <span class="sun">✦</span>
         </button>
       </div>
 
       <!-- TOGETHER -->
       <div class="screen" data-screen="together">
         <div class="together-head">
-          <div class="avatar" onclick="openSheet('profile')" role="button">B</div>
+          <div class="avatar" onclick="openSheet('profile')" role="button" aria-label="profile"></div>
           <div class="bell" onclick="openSheet('notifications')" role="button">👥</div>
         </div>
-        <div class="greeting-eyebrow" style="margin-top:18px">Together</div>
-        <div class="together-title">The people who <i>love you.</i></div>
+        <div class="greeting-eyebrow" style="margin-top:18px" data-i18n="together.eye"></div>
+        <div class="together-title" data-i18n-html="together.title"></div>
 
         <div id="peopleList"></div>
 
-        <button class="invite-btn" onclick="openSheet('invite')">+ Invite someone you trust</button>
+        <button class="invite-btn" onclick="openSheet('invite')" data-i18n="together.invite"></button>
 
-        <div class="together-feed" style="margin-top:26px">Group work</div>
-        <div class="group-sub">Shared tasks with friends. Everyone pitches in, Butler keeps score.</div>
+        <div class="together-feed" style="margin-top:26px" data-i18n="together.groups"></div>
+        <div class="group-sub" data-i18n="together.groups_sub"></div>
         <div id="groupList"></div>
-        <button class="invite-btn" style="margin-top:10px" onclick="openSheet('newGroup')">+ Start a new group</button>
+        <button class="invite-btn" style="margin-top:10px" onclick="openSheet('newGroup')" data-i18n="together.new_group"></button>
 
-        <div class="together-feed">Quiet updates</div>
+        <div class="together-feed" data-i18n="together.feed"></div>
         <div id="feedList"></div>
       </div>
 
@@ -1266,69 +1569,637 @@
 <div class="hint">Press <b>esc</b> to see the welcome again · click a reminder to open it</div>
 
 <script>
-/* ---------- State ---------- */
-const state = {
-  reminders: [
-    { id: 'pills',  time: '10:00', ampm: 'AM', title: 'Morning pills',        sub: 'The blue ones, with water', color: 'mint',  when: 'At 10:00 AM', relative: 'in about 12 minutes', note: '&ldquo;The blue ones, with a full glass of water. You said the last batch was harsh on your stomach — take it after your toast.&rdquo;', sharedWith: ['Maria'], done: false },
-    { id: 'doctor', time: '2:30',  ampm: 'PM', title: 'Dr. Reyes — checkup',  sub: 'Bring the blue folder',      color: 'cream', when: 'At 2:30 PM',  relative: 'this afternoon',       note: '&ldquo;Bring the blue folder. Maria offered to come with you — she said to text her by noon if you&rsquo;d like a ride.&rdquo;',                  sharedWith: ['Maria'], done: false },
-    { id: 'call',   time: '6:15',  ampm: 'PM', title: 'Call your daughter',   sub: 'It&rsquo;s her Tuesday',      color: 'blush', when: 'At 6:15 PM',  relative: 'this evening',         note: '&ldquo;It&rsquo;s her Tuesday. She mentioned the kids have a school thing this week — ask her how it went.&rdquo;',                                     sharedWith: [],       done: false },
-  ],
-  people: [
-    { id: 'maria', name: 'Maria', initial: 'M', relation: 'Your daughter',  color: 'mint',  seeing: 4, share: { medication: true,  appointments: true,  calls: true,  location: false } },
-    { id: 'joel',  name: 'Joel',  initial: 'J', relation: 'Your neighbor',  color: 'cream', seeing: 1, share: { medication: false, appointments: false, calls: true,  location: false } },
-  ],
-  feed: [
-    { who: 'Maria',  text: 'saw your morning pill reminder at 10:03 AM.',                    t: '10 minutes ago',  color: '#4BA572' },
-    { who: 'You',    text: 'snoozed Dr. Reyes to tomorrow. Maria was notified, at your request.', t: 'Yesterday, 4:11 PM', color: '#B99FD4' },
-    { who: 'Butler', text: 'checked in. Everything on track.',                                 t: 'Yesterday, morning',  color: '#F5C842' },
-  ],
-  notifications: [
-    { color: '#F5C842', title: 'Dr. Reyes is in 10 minutes', sub: 'Bring the blue folder.' },
-    { color: '#4BA572', title: 'Maria saw your morning pills', sub: '10 minutes ago' },
-    { color: '#B99FD4', title: 'Butler is holding 3 things for you today', sub: 'Nothing urgent right now.' },
-  ],
-  groups: [
-    {
-      id: 'birthday',
-      eyebrow: 'This Saturday',
-      title: "Dad's 80th birthday",
-      titleI: "party",
-      members: [ { i: 'M', c: 'mint' }, { i: 'J', c: 'cream' }, { i: 'A', c: 'blush' }, { i: 'R', c: 'lav' } ],
-      memberNames: 'Maria, Joel, Ana, Rico',
-      dark: true,
-      tasks: [
-        { id: 't1', title: 'Book the restaurant',       who: 'Maria',  done: true  },
-        { id: 't2', title: 'Pick up the cake',          who: 'Joel',   done: true  },
-        { id: 't3', title: 'Make the playlist',         who: 'Ana',    done: false },
-        { id: 't4', title: 'Print photos for the wall', who: 'Rico',   done: false },
-        { id: 't5', title: 'Call cousin Elena',         who: 'You',    done: false },
-      ],
-    },
-    {
-      id: 'hike',
-      eyebrow: 'Sunday, 7 AM',
-      title: "Weekend hike",
-      titleI: "with Joel",
-      members: [ { i: 'J', c: 'cream' }, { i: 'T', c: 'mint' } ],
-      memberNames: 'Joel, you',
-      dark: false,
-      tasks: [
-        { id: 'h1', title: 'Pack water & snacks', who: 'You',  done: false },
-        { id: 'h2', title: 'Bring the map',       who: 'Joel', done: false },
-        { id: 'h3', title: 'Check the weather',   who: 'You',  done: true  },
-      ],
-    },
-  ],
-  currentDetail: null,
-  currentGroup: null,
-  customWhen: null, // set by the custom-when sheet
+/* ---------- i18n ---------- */
+/**
+ * Butler PWA i18n.
+ *
+ * Shared key `butler.locale` with the landing site so a user's language
+ * choice carries across the marketing site → app hand-off. No framework,
+ * no build step — just a flat dictionary, a tiny t() helper, and a DOM
+ * sweep that replaces tagged text. State data (reminders, people, groups)
+ * is rebuilt on language change via buildState(loc).
+ */
+const STORAGE_KEY = 'butler.locale';
+const DEFAULT_LOCALE = 'en';
+const LOCALES = ['en', 'es'];
+
+const I18N = {
+  en: {
+    'welcome.h1': 'Hi.<br/><i>I&rsquo;m Butler.</i>',
+    'welcome.tagline': "A little helper for the things you\u2019d rather not forget. I\u2019ll remember so you don\u2019t have to.",
+    'welcome.begin': "Let\u2019s begin",
+    'nav.week': 'Week',
+    'home.date': 'Tuesday · April 5',
+    'home.greet_name': 'Hi, Tato.',
+    'home.count.zero': 'Nothing left today.',
+    'home.count.one': 'One small thing today.',
+    'home.count.two': 'Two small things today.',
+    'home.count.three': 'Three small things today.',
+    'home.count.many': '{n} small things today.',
+    'home.sub': "Nothing urgent right now. You\u2019re ahead.",
+    'home.pharmacy_eye': "Butler\u2019s note",
+    'home.pharmacy_h3': 'Your pharmacy is open until 8 tonight. <i>No rush.</i>',
+    'week.eyebrow': 'The week ahead',
+    'week.title': 'Here\u2019s what\u2019s coming, <i>in plain sight.</i>',
+    'week.sub': 'Seven days. Large print. Tap any day to see the details.',
+    'week.quiet': 'A quiet day.',
+    'week.days': ['Today','Wednesday','Thursday','Friday','Saturday','Sunday','Monday'],
+    'week.dates': ['Tue Apr 5','Wed Apr 6','Thu Apr 7','Fri Apr 8','Sat Apr 9','Sun Apr 10','Mon Apr 11'],
+    'detail.done_handled': 'done · nicely handled',
+    'detail.holding': 'Butler is holding this for you',
+    'detail.reaches_by': 'Reaches you by',
+    'detail.phone': 'Phone',
+    'detail.text': 'Text',
+    'detail.email': 'Email',
+    'detail.mark_done': 'Mark done ✓',
+    'detail.snooze': 'Snooze 10m',
+    'detail.tell_label': 'Things to tell',
+    'detail.tell_title': 'Things to tell <i>{provider}</i>',
+    'detail.tell_desc': 'Add anything as it comes to mind. Butler will hand you the list at your appointment so nothing slips — you stay the one who sends.',
+    'detail.tell_ph': 'Something to mention…',
+    'detail.tell_add': 'Add ✦',
+    'detail.tell_draft': 'Draft a message I can review ✉️',
+    'detail.tell_empty': 'Nothing yet. Butler is ready whenever you are.',
+    'detail.tell_added': 'added {ago}',
+    'detail.tell_just_now': 'just now',
+    'detail.shared_with_label': 'Shared with',
+    'detail.shared_line': '<b>{name} ({relation})</b> can see this one. <span class="t">You turned this on last week.</span>',
+    'detail.relation_daughter': 'daughter',
+    'add.title': 'What should Butler <i>remember?</i>',
+    'add.ph': "Tell me, plainly. I\u2019ll take it from here.",
+    'add.cat_med': 'Medication',
+    'add.cat_appt': 'Appointment',
+    'add.cat_call': 'Call someone',
+    'add.cat_bday': 'A birthday',
+    'add.cat_other': 'Something else',
+    'add.when_label': 'When?',
+    'add.once': 'Once',
+    'add.every_morn': 'Every morning',
+    'add.every_week': 'Every week',
+    'add.custom': 'Custom… ✦',
+    'add.save': "I\u2019ve got it",
+    'add.whenlabel_at': 'At {time} {ampm}',
+    'add.whenlabel_at_days': 'At {time} {ampm} — {days}',
+    'add.relative_hour': 'in about an hour',
+    'add.relative_custom': 'custom schedule',
+    'add.default_sub': 'Butler is holding it for you',
+    'together.eye': 'Together',
+    'together.title': 'The people who <i>love you.</i>',
+    'together.invite': '+ Invite someone you trust',
+    'together.groups': 'Group work',
+    'together.groups_sub': 'Shared tasks with friends. Everyone pitches in, Butler keeps score.',
+    'together.new_group': '+ Start a new group',
+    'together.feed': 'Quiet updates',
+    'together.person_sees_one': '{relation} · sees 1 thing',
+    'together.person_sees_many': '{relation} · sees {n} things',
+    'tab.today': 'Today',
+    'tab.add': 'Add',
+    'tab.together': 'Together',
+    'profile.title': 'Hi, <i>Tato.</i>',
+    'profile.sub': "You\u2019ve been with Butler for 14 days. Everything is on track.",
+    'profile.notif': 'Notifications',
+    'profile.notif_hint': 'Phone · Text · Email',
+    'profile.quiet': 'Quiet hours',
+    'profile.quiet_hint': '10 PM – 7 AM',
+    'profile.bigtext': 'Big text',
+    'profile.bigtext_hint': 'Easier to read',
+    'profile.language': 'Language',
+    'profile.language_hint': 'English / Español',
+    'profile.done': 'Done',
+    'profile.show_welcome': 'Show the welcome screen again',
+    'profile.saved': 'Saved ✦',
+    'profile.all_saved': 'All changes saved ✦',
+    'notif.title': "What\u2019s <i>happening.</i>",
+    'notif.sub': 'Quiet, helpful updates — nothing loud.',
+    'notif.mark_all': 'Mark all as read',
+    'notif.cleared': 'Cleared ✦',
+    'pharmacy.title': 'Your <i>pharmacy.</i>',
+    'pharmacy.sub': "Corner of Oak and 5th. Open until 8 PM tonight. No rush — Butler will remind you if you\u2019re running low.",
+    'pharmacy.directions': 'Get directions',
+    'pharmacy.call_ahead': 'Ask Butler to call ahead',
+    'pharmacy.directions_ready': 'Directions ready ✦',
+    'pharmacy.call_scheduled': 'Butler will call ahead ✦',
+    'person.sub': 'You decide what {name} sees. Change anything, any time.',
+    'person.med': 'Medication reminders',
+    'person.med_hint': 'So {name} can help',
+    'person.appts': 'Appointments',
+    'person.appts_hint': 'Doctor, dentist, etc.',
+    'person.calls': 'Family calls',
+    'person.calls_hint': 'Birthdays and check-ins',
+    'person.loc': 'Location',
+    'person.loc_hint': 'Never on by default',
+    'person.done': 'Done',
+    'person.pause': 'Pause sharing with {name}',
+    'person.saved_for': 'Saved for {name} ✦',
+    'person.now_sees': '{name} now sees {key} ✦',
+    'person.no_longer_sees': '{name} no longer sees {key} ✦',
+    'person.paused': 'Sharing with {name} paused ✦',
+    'share.medication': 'medication',
+    'share.appointments': 'appointments',
+    'share.calls': 'calls',
+    'share.location': 'location',
+    'group.sub': 'With {names}. Everyone pitches in — Butler keeps score.',
+    'group.of_done': '<b>{done}</b> of {total} done',
+    'group.add_ph': '+ Add something to the list',
+    'group.add_btn': 'Add it ✦',
+    'group.done_btn': 'Done',
+    'group.done_badge': 'DONE ✦',
+    'group.task_done': '{title} — done ✦',
+    'group.added_list': 'Added to the list ✦',
+    'group.need_task': 'Type a task first ✦',
+    'newGroup.title': 'Start a <i>group.</i>',
+    'newGroup.sub': 'Give it a name. Invite people. Share the work — Butler keeps everyone in sync.',
+    'newGroup.name_ph': 'Like \u201CWeekend hike\u201D or \u201CMom\u2019s party\u201D',
+    'newGroup.when_ph': 'When? (optional)',
+    'newGroup.with_ph': 'With whom? (comma-separated names)',
+    'newGroup.start': 'Start the group ✦',
+    'newGroup.cancel': 'Not now',
+    'newGroup.need_name': 'Give it a name ✦',
+    'newGroup.started': 'Group started ✦',
+    'newGroup.feed_text': 'started a new group: {name}.',
+    'newGroup.soon': 'Soon',
+    'newGroup.you_alone': 'just you',
+    'newGroup.you_with': 'you, {names}',
+    'cw.title': 'Custom <i>schedule.</i>',
+    'cw.sub': 'Pick the time and days. Butler will nudge you exactly then — not a minute earlier, not a minute later.',
+    'cw.repeat': 'Repeat on',
+    'cw.label_ph': 'What should I remember?',
+    'cw.use': 'Use this schedule ✦',
+    'cw.cancel': 'Cancel',
+    'cw.saved': 'Schedule saved ✦',
+    'cw.day_letters': ['M','T','W','T','F','S','S'],
+    'cw.once': 'Once',
+    'cw.every_day': 'every day',
+    'cw.weekdays': 'weekdays',
+    'cw.weekends': 'weekends',
+    'cw.every_day_cap': 'Every day',
+    'cw.weekdays_cap': 'Weekdays',
+    'cw.days_week': '{n} days/week',
+    'invite.title': 'Invite someone <i>you trust.</i>',
+    'invite.sub': "They\u2019ll get a friendly note. You stay in charge of everything they can see.",
+    'invite.name_ph': 'Their name — like \u201CMaria\u201D',
+    'invite.rel_ph': 'Who they are — like \u201Cmy son\u201D',
+    'invite.send': 'Send the invite ✦',
+    'invite.cancel': 'Not now',
+    'invite.need_name': 'A name, please ✦',
+    'invite.sent': 'Invite sent to {name} ✦',
+    'invite.default_rel': 'Someone you trust',
+    'invite.feed_text': 'invited {name} to share your Butler.',
+    'toast.full_story': 'Butler is holding the full story. ✦',
+    'toast.need_text': 'Tell me what to remember ✦',
+    'toast.got_it': "Got it. I\u2019ll remember. ✦",
+    'toast.butler_got_it': "Butler\u2019s got it ✓",
+    'toast.snoozed': 'Snoozed 10 minutes ✦',
+    'toast.snoozed_rel': 'snoozed — 10 minutes later',
+    'toast.tell_remember': 'Butler will remember ✦',
+    'toast.draft_ready': 'Draft ready. Open {portal} to review & send ✉️',
+    'toast.draft_default_portal': 'their portal',
+  },
+  es: {
+    'welcome.h1': 'Hola.<br/><i>Soy Butler.</i>',
+    'welcome.tagline': 'Un pequeño ayudante para las cosas que preferirías no olvidar. Yo las recuerdo para que tú no tengas que hacerlo.',
+    'welcome.begin': 'Empecemos',
+    'nav.week': 'Semana',
+    'home.date': 'Martes · 5 de abril',
+    'home.greet_name': 'Hola, Tato.',
+    'home.count.zero': 'Nada pendiente hoy.',
+    'home.count.one': 'Una cosita hoy.',
+    'home.count.two': 'Dos cositas hoy.',
+    'home.count.three': 'Tres cositas hoy.',
+    'home.count.many': '{n} cositas hoy.',
+    'home.sub': 'Nada urgente por ahora. Vas adelantado.',
+    'home.pharmacy_eye': 'Una nota de Butler',
+    'home.pharmacy_h3': 'Tu farmacia está abierta hasta las 8 esta noche. <i>Sin prisa.</i>',
+    'week.eyebrow': 'La semana que viene',
+    'week.title': 'Esto es lo que viene, <i>a plena vista.</i>',
+    'week.sub': 'Siete días. Letra grande. Toca cualquier día para ver los detalles.',
+    'week.quiet': 'Un día tranquilo.',
+    'week.days': ['Hoy','Miércoles','Jueves','Viernes','Sábado','Domingo','Lunes'],
+    'week.dates': ['Mar 5 abr','Mié 6 abr','Jue 7 abr','Vie 8 abr','Sáb 9 abr','Dom 10 abr','Lun 11 abr'],
+    'detail.done_handled': 'hecho · bien manejado',
+    'detail.holding': 'Butler está guardando esto para ti',
+    'detail.reaches_by': 'Te llega por',
+    'detail.phone': 'Llamada',
+    'detail.text': 'Mensaje',
+    'detail.email': 'Correo',
+    'detail.mark_done': 'Marcar hecho ✓',
+    'detail.snooze': 'Posponer 10 min',
+    'detail.tell_label': 'Cosas que contar',
+    'detail.tell_title': 'Cosas para decirle a <i>{provider}</i>',
+    'detail.tell_desc': 'Agrega lo que se te ocurra. Butler te entregará la lista en tu cita para que nada se te escape — tú sigues siendo quien envía.',
+    'detail.tell_ph': 'Algo que mencionar…',
+    'detail.tell_add': 'Agregar ✦',
+    'detail.tell_draft': 'Redactar un mensaje para revisar ✉️',
+    'detail.tell_empty': 'Nada todavía. Butler está listo cuando tú lo estés.',
+    'detail.tell_added': 'agregado {ago}',
+    'detail.tell_just_now': 'ahora mismo',
+    'detail.shared_with_label': 'Compartido con',
+    'detail.shared_line': '<b>{name} ({relation})</b> puede ver esto. <span class="t">Lo activaste la semana pasada.</span>',
+    'detail.relation_daughter': 'hija',
+    'add.title': '¿Qué debe Butler <i>recordar?</i>',
+    'add.ph': 'Dímelo con sencillez. Yo me encargo.',
+    'add.cat_med': 'Medicamento',
+    'add.cat_appt': 'Cita',
+    'add.cat_call': 'Llamar a alguien',
+    'add.cat_bday': 'Un cumpleaños',
+    'add.cat_other': 'Otra cosa',
+    'add.when_label': '¿Cuándo?',
+    'add.once': 'Una vez',
+    'add.every_morn': 'Cada mañana',
+    'add.every_week': 'Cada semana',
+    'add.custom': 'Personalizado… ✦',
+    'add.save': 'Ya lo tengo',
+    'add.whenlabel_at': 'A las {time} {ampm}',
+    'add.whenlabel_at_days': 'A las {time} {ampm} — {days}',
+    'add.relative_hour': 'en una hora aproximadamente',
+    'add.relative_custom': 'horario personalizado',
+    'add.default_sub': 'Butler lo está guardando para ti',
+    'together.eye': 'Juntos',
+    'together.title': 'Las personas que <i>te quieren.</i>',
+    'together.invite': '+ Invita a alguien de confianza',
+    'together.groups': 'Trabajo en grupo',
+    'together.groups_sub': 'Tareas compartidas con amigos. Todos ayudan, Butler lleva la cuenta.',
+    'together.new_group': '+ Empezar un grupo nuevo',
+    'together.feed': 'Actualizaciones tranquilas',
+    'together.person_sees_one': '{relation} · ve 1 cosa',
+    'together.person_sees_many': '{relation} · ve {n} cosas',
+    'tab.today': 'Hoy',
+    'tab.add': 'Agregar',
+    'tab.together': 'Juntos',
+    'profile.title': 'Hola, <i>Tato.</i>',
+    'profile.sub': 'Llevas 14 días con Butler. Todo va bien.',
+    'profile.notif': 'Notificaciones',
+    'profile.notif_hint': 'Llamada · Mensaje · Correo',
+    'profile.quiet': 'Horas tranquilas',
+    'profile.quiet_hint': '10 PM – 7 AM',
+    'profile.bigtext': 'Letra grande',
+    'profile.bigtext_hint': 'Más fácil de leer',
+    'profile.language': 'Idioma',
+    'profile.language_hint': 'English / Español',
+    'profile.done': 'Listo',
+    'profile.show_welcome': 'Volver a mostrar la pantalla de bienvenida',
+    'profile.saved': 'Guardado ✦',
+    'profile.all_saved': 'Todo guardado ✦',
+    'notif.title': 'Qué está <i>pasando.</i>',
+    'notif.sub': 'Actualizaciones tranquilas y útiles — sin ruido.',
+    'notif.mark_all': 'Marcar todo como leído',
+    'notif.cleared': 'Todo limpio ✦',
+    'pharmacy.title': 'Tu <i>farmacia.</i>',
+    'pharmacy.sub': 'En la esquina de Oak y 5. Abierta hasta las 8 PM esta noche. Sin prisa — Butler te avisará si se te está acabando algo.',
+    'pharmacy.directions': 'Cómo llegar',
+    'pharmacy.call_ahead': 'Pedirle a Butler que llame antes',
+    'pharmacy.directions_ready': 'Direcciones listas ✦',
+    'pharmacy.call_scheduled': 'Butler llamará antes ✦',
+    'person.sub': 'Tú decides qué ve {name}. Cambia lo que quieras, cuando quieras.',
+    'person.med': 'Recordatorios de medicamentos',
+    'person.med_hint': 'Para que {name} pueda ayudarte',
+    'person.appts': 'Citas',
+    'person.appts_hint': 'Médico, dentista, etc.',
+    'person.calls': 'Llamadas familiares',
+    'person.calls_hint': 'Cumpleaños y saludos',
+    'person.loc': 'Ubicación',
+    'person.loc_hint': 'Nunca activa por defecto',
+    'person.done': 'Listo',
+    'person.pause': 'Pausar lo compartido con {name}',
+    'person.saved_for': 'Guardado para {name} ✦',
+    'person.now_sees': '{name} ahora ve {key} ✦',
+    'person.no_longer_sees': '{name} ya no ve {key} ✦',
+    'person.paused': 'Pausado lo compartido con {name} ✦',
+    'share.medication': 'medicamentos',
+    'share.appointments': 'citas',
+    'share.calls': 'llamadas',
+    'share.location': 'ubicación',
+    'group.sub': 'Con {names}. Todos ayudan — Butler lleva la cuenta.',
+    'group.of_done': '<b>{done}</b> de {total} hechas',
+    'group.add_ph': '+ Agregar algo a la lista',
+    'group.add_btn': 'Agregar ✦',
+    'group.done_btn': 'Listo',
+    'group.done_badge': 'HECHO ✦',
+    'group.task_done': '{title} — hecha ✦',
+    'group.added_list': 'Agregada a la lista ✦',
+    'group.need_task': 'Escribe una tarea primero ✦',
+    'newGroup.title': 'Empezar un <i>grupo.</i>',
+    'newGroup.sub': 'Ponle un nombre. Invita personas. Comparte el trabajo — Butler mantiene a todos en sintonía.',
+    'newGroup.name_ph': 'Como \u201CCaminata del fin de semana\u201D o \u201CFiesta de mamá\u201D',
+    'newGroup.when_ph': '¿Cuándo? (opcional)',
+    'newGroup.with_ph': '¿Con quién? (nombres separados por comas)',
+    'newGroup.start': 'Empezar el grupo ✦',
+    'newGroup.cancel': 'Ahora no',
+    'newGroup.need_name': 'Ponle un nombre ✦',
+    'newGroup.started': 'Grupo creado ✦',
+    'newGroup.feed_text': 'empezó un grupo nuevo: {name}.',
+    'newGroup.soon': 'Pronto',
+    'newGroup.you_alone': 'solo tú',
+    'newGroup.you_with': 'tú, {names}',
+    'cw.title': 'Horario <i>personalizado.</i>',
+    'cw.sub': 'Elige la hora y los días. Butler te avisará justo entonces — ni un minuto antes, ni un minuto después.',
+    'cw.repeat': 'Repetir en',
+    'cw.label_ph': '¿Qué debo recordar?',
+    'cw.use': 'Usar este horario ✦',
+    'cw.cancel': 'Cancelar',
+    'cw.saved': 'Horario guardado ✦',
+    'cw.day_letters': ['L','M','X','J','V','S','D'],
+    'cw.once': 'Una vez',
+    'cw.every_day': 'todos los días',
+    'cw.weekdays': 'entre semana',
+    'cw.weekends': 'fines de semana',
+    'cw.every_day_cap': 'Todos los días',
+    'cw.weekdays_cap': 'Entre semana',
+    'cw.days_week': '{n} días/semana',
+    'invite.title': 'Invita a alguien <i>de confianza.</i>',
+    'invite.sub': 'Recibirá un mensaje amable. Tú sigues a cargo de todo lo que pueda ver.',
+    'invite.name_ph': 'Su nombre — como \u201CMaría\u201D',
+    'invite.rel_ph': 'Quién es — como \u201Cmi hijo\u201D',
+    'invite.send': 'Enviar la invitación ✦',
+    'invite.cancel': 'Ahora no',
+    'invite.need_name': 'Un nombre, por favor ✦',
+    'invite.sent': 'Invitación enviada a {name} ✦',
+    'invite.default_rel': 'Alguien de confianza',
+    'invite.feed_text': 'invitó a {name} a compartir tu Butler.',
+    'toast.full_story': 'Butler tiene la historia completa. ✦',
+    'toast.need_text': 'Dime qué quieres que recuerde ✦',
+    'toast.got_it': 'Listo. Lo voy a recordar. ✦',
+    'toast.butler_got_it': 'Butler lo anotó ✓',
+    'toast.snoozed': 'Pospuesto 10 minutos ✦',
+    'toast.snoozed_rel': 'pospuesto — 10 minutos después',
+    'toast.tell_remember': 'Butler lo va a recordar ✦',
+    'toast.draft_ready': 'Borrador listo. Abre {portal} para revisar y enviar ✉️',
+    'toast.draft_default_portal': 'su portal',
+  },
 };
+
+let locale = DEFAULT_LOCALE;
+
+function detectLocale() {
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored && LOCALES.includes(stored)) return stored;
+  } catch (e) { /* localStorage may be unavailable */ }
+  const nav = (navigator.languages && navigator.languages[0]) || navigator.language || '';
+  if (nav.toLowerCase().startsWith('es')) return 'es';
+  return DEFAULT_LOCALE;
+}
+
+function t(key, vars) {
+  const dict = I18N[locale] || I18N[DEFAULT_LOCALE];
+  let val = dict[key];
+  if (val === undefined) val = I18N[DEFAULT_LOCALE][key];
+  if (val === undefined) return key;
+  if (typeof val === 'string' && vars) {
+    val = val.replace(/\{(\w+)\}/g, (_, k) => (vars[k] !== undefined ? vars[k] : '{' + k + '}'));
+  }
+  return val;
+}
+
+function applyStaticI18n() {
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    el.textContent = t(el.getAttribute('data-i18n'));
+  });
+  document.querySelectorAll('[data-i18n-html]').forEach(el => {
+    el.innerHTML = t(el.getAttribute('data-i18n-html'));
+  });
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+    el.setAttribute('placeholder', t(el.getAttribute('data-i18n-placeholder')));
+  });
+  // Language pill active state (welcome overlay + any inline copy)
+  document.querySelectorAll('.lang-pill').forEach(pill => {
+    pill.querySelectorAll('button[data-lang]').forEach(btn => {
+      btn.classList.toggle('active', btn.getAttribute('data-lang') === locale);
+    });
+  });
+  document.documentElement.lang = locale;
+}
+
+function setLocale(loc) {
+  if (!LOCALES.includes(loc)) return;
+  locale = loc;
+  try { localStorage.setItem(STORAGE_KEY, loc); } catch (e) {}
+  state = buildState(loc);
+  applyStaticI18n();
+  renderAll();
+  updateGreetingCount();
+  updateSharedLine();
+  // If a sheet is open, re-render its content with the new locale
+  const sheet = document.getElementById('sheet');
+  if (sheet && sheet.classList.contains('open')) {
+    const content = document.getElementById('sheetContent');
+    if (content && currentSheet) {
+      content.innerHTML = sheetContent(currentSheet.kind, currentSheet.arg);
+    }
+  }
+  // If detail screen is showing, refresh its dynamic bits
+  if (state.currentDetail) {
+    const r = state.reminders.find(x => x.id === state.currentDetail);
+    if (r) {
+      document.getElementById('detail-eyebrow').textContent = r.when;
+      document.getElementById('detail-title').textContent = r.title;
+      document.getElementById('detail-time').textContent = r.done ? t('detail.done_handled') : r.relative;
+      document.getElementById('detail-note').innerHTML = r.note;
+      if (r.type === 'appointment' && r.providerName) {
+        document.getElementById('tellTitle').innerHTML = t('detail.tell_title', { provider: r.providerName });
+        renderTellList(r);
+      }
+    }
+  }
+}
+
+/* ---------- State (built per-locale) ---------- */
+function buildState(loc) {
+  const es = loc === 'es';
+  return {
+    reminders: [
+      { id: 'pills', type: 'med', dayOffset: 0, time: '10:00', ampm: 'AM',
+        title: es ? 'Pastillas de la mañana' : 'Morning pills',
+        sub:   es ? 'Las azules, con agua'   : 'The blue ones, with water',
+        color: 'mint',
+        when:  es ? 'A las 10:00 AM'         : 'At 10:00 AM',
+        relative: es ? 'en unos 12 minutos'  : 'in about 12 minutes',
+        note:  es
+          ? '&ldquo;Las azules, con un vaso lleno de agua. Dijiste que las últimas te hacían daño al estómago — tómatelas después del pan tostado.&rdquo;'
+          : '&ldquo;The blue ones, with a full glass of water. You said the last batch was harsh on your stomach — take it after your toast.&rdquo;',
+        sharedWith: ['Maria'], done: false },
+      { id: 'doctor', type: 'appointment', dayOffset: 0, time: '2:30', ampm: 'PM',
+        title: es ? 'Dr. Reyes — chequeo'    : 'Dr. Reyes — checkup',
+        sub:   es ? 'Lleva la carpeta azul'  : 'Bring the blue folder',
+        color: 'cream',
+        when:  es ? 'A las 2:30 PM'          : 'At 2:30 PM',
+        relative: es ? 'esta tarde'          : 'this afternoon',
+        note:  es
+          ? '&ldquo;Lleva la carpeta azul. María se ofreció a acompañarte — dijo que le escribieras antes del mediodía si quieres que te lleve.&rdquo;'
+          : '&ldquo;Bring the blue folder. Maria offered to come with you — she said to text her by noon if you&rsquo;d like a ride.&rdquo;',
+        sharedWith: ['Maria'], done: false,
+        providerName: 'Dr. Reyes',
+        portal: 'MyChart',
+        thingsToTell: es ? [
+          { id: 'tt1', text: 'Me ha dolido la espalda por las mañanas',         added: 'hace 2 días' },
+          { id: 'tt2', text: 'Las pastillas azules me dan sueño a eso de las 3', added: 'ayer' },
+          { id: 'tt3', text: 'Preguntar por la receta nueva que mencionó María', added: 'esta mañana' },
+        ] : [
+          { id: 'tt1', text: 'My back has been stiff in the mornings',          added: '2 days ago' },
+          { id: 'tt2', text: 'The blue pills make me sleepy around 3',          added: 'yesterday' },
+          { id: 'tt3', text: 'Ask about the new prescription Maria mentioned',  added: 'this morning' },
+        ],
+      },
+      { id: 'call', type: 'call', dayOffset: 0, time: '6:15', ampm: 'PM',
+        title: es ? 'Llamar a tu hija' : 'Call your daughter',
+        sub:   es ? 'Es su martes'     : 'It&rsquo;s her Tuesday',
+        color: 'blush',
+        when:  es ? 'A las 6:15 PM'    : 'At 6:15 PM',
+        relative: es ? 'esta noche'    : 'this evening',
+        note:  es
+          ? '&ldquo;Es su martes. Mencionó que los niños tienen algo de la escuela esta semana — pregúntale cómo les fue.&rdquo;'
+          : '&ldquo;It&rsquo;s her Tuesday. She mentioned the kids have a school thing this week — ask her how it went.&rdquo;',
+        sharedWith: [], done: false },
+      { id: 'plants', type: 'errand', dayOffset: 1, time: '9:00', ampm: 'AM',
+        title: es ? 'Regar las plantas'           : 'Water the plants',
+        sub:   es ? 'Antes de que apriete el sol' : 'Before the sun gets high',
+        color: 'mint',
+        when:  es ? 'Mié, 9:00 AM'                : 'Wed, 9:00 AM',
+        relative: es ? 'mañana por la mañana'     : 'tomorrow morning',
+        note:  es
+          ? '&ldquo;Especialmente las del alféizar de la cocina — ayer se veían sedientas.&rdquo;'
+          : '&ldquo;The ones on the kitchen sill especially — they were looking thirsty yesterday.&rdquo;',
+        sharedWith: [], done: false },
+      { id: 'bday', type: 'birthday', dayOffset: 2, time: '10:00', ampm: 'AM',
+        title: es ? 'Cumpleaños de tía Nina' : 'Aunt Nina&rsquo;s birthday',
+        sub:   es ? 'Hoy cumple 84'          : 'She&rsquo;s 84 today',
+        color: 'blush',
+        when:  es ? 'Jue, 10:00 AM'          : 'Thu, 10:00 AM',
+        relative: es ? 'el jueves'           : 'Thursday',
+        note:  es
+          ? '&ldquo;Le encantó la foto del pastel de limón que le mandaste el año pasado. Tal vez llámala por la mañana.&rdquo;'
+          : '&ldquo;She loved the lemon cake photo you sent last year. Maybe call her in the morning.&rdquo;',
+        sharedWith: ['Maria'], done: false },
+      { id: 'refill', type: 'errand', dayOffset: 3, time: '2:00', ampm: 'PM',
+        title: es ? 'Recoger receta en la farmacia' : 'Pharmacy refill',
+        sub:   es ? 'Recoge las azules'              : 'Pick up the blue ones',
+        color: 'cream',
+        when:  es ? 'Vie, 2:00 PM'                   : 'Fri, 2:00 PM',
+        relative: es ? 'el viernes por la tarde'     : 'Friday afternoon',
+        note:  es
+          ? '&ldquo;La farmacia dijo que tu resurtido estará listo el viernes. Abierta hasta las 8.&rdquo;'
+          : '&ldquo;The pharmacy said your refill would be ready by Friday. Open until 8.&rdquo;',
+        sharedWith: ['Maria'], done: false },
+      { id: 'party', type: 'appointment', dayOffset: 4, time: '6:00', ampm: 'PM',
+        title: es ? 'Fiesta de los 80 de papá' : "Dad&rsquo;s 80th birthday party",
+        sub:   es ? 'En el restaurante'        : 'At the restaurant',
+        color: 'lav',
+        when:  es ? 'Sáb, 6:00 PM'             : 'Sat, 6:00 PM',
+        relative: es ? 'el sábado por la noche' : 'Saturday evening',
+        note:  es
+          ? '&ldquo;María reservó la mesa. Rico está imprimiendo las fotos. Ponte la camisa azul.&rdquo;'
+          : '&ldquo;Maria booked the table. Rico is printing the photos. Wear the blue shirt.&rdquo;',
+        sharedWith: ['Maria','Joel'], done: false },
+      { id: 'hike', type: 'appointment', dayOffset: 5, time: '7:00', ampm: 'AM',
+        title: es ? 'Caminata con Joel'     : 'Hike with Joel',
+        sub:   es ? 'Nos vemos en su porche' : 'Meet at his porch',
+        color: 'mint',
+        when:  es ? 'Dom, 7:00 AM'          : 'Sun, 7:00 AM',
+        relative: es ? 'el domingo por la mañana' : 'Sunday morning',
+        note:  es
+          ? '&ldquo;Joel dijo que lleves agua y la chaqueta gris. Él lleva el mapa.&rdquo;'
+          : '&ldquo;Joel said bring water and the grey jacket. He&rsquo;ll bring the map.&rdquo;',
+        sharedWith: ['Joel'], done: false },
+      { id: 'pt', type: 'appointment', dayOffset: 6, time: '10:00', ampm: 'AM',
+        title: es ? 'Fisioterapia'        : 'Physical therapy',
+        sub:   es ? 'Con la señora Alvarez' : 'With Mrs. Alvarez',
+        color: 'cream',
+        when:  es ? 'Lun, 10:00 AM'       : 'Mon, 10:00 AM',
+        relative: es ? 'el próximo lunes' : 'next Monday',
+        note:  es
+          ? '&ldquo;Lleva la botella de agua y la hoja de ejercicios de la última vez.&rdquo;'
+          : '&ldquo;Bring your water bottle and the exercise sheet from last time.&rdquo;',
+        sharedWith: ['Maria'], done: false,
+        providerName: es ? 'la Sra. Alvarez' : 'Mrs. Alvarez',
+        portal:       es ? 'el portal de la clínica' : 'the clinic portal',
+        thingsToTell: es
+          ? [{ id: 'pt1', text: 'El ejercicio del hombro ayudó mucho', added: 'ayer' }]
+          : [{ id: 'pt1', text: 'The shoulder exercise helped a lot',  added: 'yesterday' }],
+      },
+    ],
+    people: [
+      { id: 'maria', name: 'Maria', initial: 'M',
+        relation: es ? 'Tu hija' : 'Your daughter',
+        color: 'mint', seeing: 4,
+        share: { medication: true, appointments: true, calls: true, location: false } },
+      { id: 'joel', name: 'Joel', initial: 'J',
+        relation: es ? 'Tu vecino' : 'Your neighbor',
+        color: 'cream', seeing: 1,
+        share: { medication: false, appointments: false, calls: true, location: false } },
+    ],
+    feed: [
+      { who: 'Maria',
+        text: es ? 'vio tu recordatorio de pastillas a las 10:03 AM.'
+                 : 'saw your morning pill reminder at 10:03 AM.',
+        t:    es ? 'hace 10 minutos' : '10 minutes ago',
+        color: '#4BA572' },
+      { who: es ? 'Tú' : 'You',
+        text: es ? 'pospuso al Dr. Reyes a mañana. María fue avisada, a petición tuya.'
+                 : 'snoozed Dr. Reyes to tomorrow. Maria was notified, at your request.',
+        t:    es ? 'Ayer, 4:11 PM' : 'Yesterday, 4:11 PM',
+        color: '#B99FD4' },
+      { who: 'Butler',
+        text: es ? 'hizo un chequeo. Todo en orden.' : 'checked in. Everything on track.',
+        t:    es ? 'Ayer, por la mañana' : 'Yesterday, morning',
+        color: '#F5C842' },
+    ],
+    notifications: [
+      { color: '#F5C842',
+        title: es ? 'Dr. Reyes en 10 minutos' : 'Dr. Reyes is in 10 minutes',
+        sub:   es ? 'Lleva la carpeta azul.'  : 'Bring the blue folder.' },
+      { color: '#4BA572',
+        title: es ? 'María vio tus pastillas de la mañana' : 'Maria saw your morning pills',
+        sub:   es ? 'hace 10 minutos'                      : '10 minutes ago' },
+      { color: '#B99FD4',
+        title: es ? 'Butler tiene 3 cositas para ti hoy'   : 'Butler is holding 3 things for you today',
+        sub:   es ? 'Nada urgente ahora mismo.'            : 'Nothing urgent right now.' },
+    ],
+    groups: [
+      { id: 'birthday',
+        eyebrow: es ? 'Este sábado' : 'This Saturday',
+        title:   es ? 'Los 80 de papá' : "Dad's 80th birthday",
+        titleI:  es ? 'fiesta' : 'party',
+        members: [{ i:'M', c:'mint' }, { i:'J', c:'cream' }, { i:'A', c:'blush' }, { i:'R', c:'lav' }],
+        memberNames: 'Maria, Joel, Ana, Rico',
+        dark: true,
+        tasks: [
+          { id: 't1', title: es ? 'Reservar el restaurante'      : 'Book the restaurant',       who: 'Maria', done: true  },
+          { id: 't2', title: es ? 'Recoger el pastel'            : 'Pick up the cake',          who: 'Joel',  done: true  },
+          { id: 't3', title: es ? 'Hacer la playlist'            : 'Make the playlist',         who: 'Ana',   done: false },
+          { id: 't4', title: es ? 'Imprimir fotos para la pared' : 'Print photos for the wall', who: 'Rico',  done: false },
+          { id: 't5', title: es ? 'Llamar a la prima Elena'      : 'Call cousin Elena',         who: es ? 'Tú' : 'You', done: false },
+        ],
+      },
+      { id: 'hike',
+        eyebrow: es ? 'Domingo, 7 AM' : 'Sunday, 7 AM',
+        title:   es ? 'Caminata del fin de semana' : 'Weekend hike',
+        titleI:  es ? 'con Joel' : 'with Joel',
+        members: [{ i:'J', c:'cream' }, { i:'T', c:'mint' }],
+        memberNames: es ? 'Joel, tú' : 'Joel, you',
+        dark: false,
+        tasks: [
+          { id: 'h1', title: es ? 'Empacar agua y bocadillos' : 'Pack water & snacks', who: es ? 'Tú' : 'You',  done: false },
+          { id: 'h2', title: es ? 'Traer el mapa'             : 'Bring the map',       who: 'Joel', done: false },
+          { id: 'h3', title: es ? 'Revisar el clima'          : 'Check the weather',   who: es ? 'Tú' : 'You',  done: true  },
+        ],
+      },
+    ],
+    currentDetail: null,
+    currentGroup: null,
+    customWhen: null,
+  };
+}
+
+let state = buildState(DEFAULT_LOCALE);
+
+/* Currently-open sheet, so we can re-render it on language change */
+let currentSheet = null;
 
 /* ---------- Render ---------- */
 function renderReminders() {
   const list = document.getElementById('remindersList');
   list.innerHTML = '';
-  state.reminders.forEach(r => {
+  state.reminders.filter(r => (r.dayOffset || 0) === 0).forEach(r => {
     const el = document.createElement('div');
     el.className = 'reminder ' + r.color + (r.done ? ' done' : '');
     el.onclick = () => openDetail(r.id);
@@ -1342,14 +2213,30 @@ function renderReminders() {
     `;
     list.appendChild(el);
   });
+  updateGreetingCount();
+}
 
-  // Update greeting count
-  const greeting = document.querySelector('.greeting-title');
-  if (greeting) {
-    const remaining = state.reminders.filter(r => !r.done).length;
-    const word = remaining === 0 ? 'Nothing left' : remaining === 1 ? 'One small thing' : (remaining === 2 ? 'Two small things' : remaining === 3 ? 'Three small things' : remaining + ' things');
-    greeting.innerHTML = `Hi, Tato. <i>${word} today.</i>`;
-  }
+function updateGreetingCount() {
+  const greeting = document.getElementById('greetingTitle');
+  if (!greeting) return;
+  const remaining = state.reminders.filter(r => (r.dayOffset || 0) === 0 && !r.done).length;
+  let countKey;
+  if      (remaining === 0) countKey = 'home.count.zero';
+  else if (remaining === 1) countKey = 'home.count.one';
+  else if (remaining === 2) countKey = 'home.count.two';
+  else if (remaining === 3) countKey = 'home.count.three';
+  else                      countKey = 'home.count.many';
+  const phrase = t(countKey, { n: remaining });
+  greeting.innerHTML = `${t('home.greet_name')} <i>${phrase}</i>`;
+}
+
+function updateSharedLine() {
+  const el = document.getElementById('detailSharedLine');
+  if (!el) return;
+  el.innerHTML = t('detail.shared_line', {
+    name: 'Maria',
+    relation: t('detail.relation_daughter'),
+  });
 }
 
 function renderPeople() {
@@ -1361,11 +2248,13 @@ function renderPeople() {
     el.className = 'person-card';
     el.style.cursor = 'pointer';
     el.onclick = () => openSheet('person', p.id);
+    const seesKey = p.seeing === 1 ? 'together.person_sees_one' : 'together.person_sees_many';
+    const sees = t(seesKey, { relation: p.relation, n: p.seeing });
     el.innerHTML = `
       <div class="person-avatar ${p.color}">${p.initial}</div>
       <div class="person-body">
         <div class="person-name">${p.name}</div>
-        <div class="person-status"><span class="status-dot"></span>${p.relation} · sees ${p.seeing} thing${p.seeing !== 1 ? 's' : ''}</div>
+        <div class="person-status"><span class="status-dot"></span>${sees}</div>
       </div>
       <div class="r-arrow" style="background:var(--lavender-2);color:var(--ink)">→</div>
     `;
@@ -1377,11 +2266,11 @@ function renderFeed() {
   const list = document.getElementById('feedList');
   if (!list) return;
   list.innerHTML = '';
-  state.feed.forEach((f, i) => {
+  state.feed.forEach(f => {
     const el = document.createElement('div');
     el.className = 'feed-item';
     el.style.cursor = 'pointer';
-    el.onclick = () => toast(`Butler is holding the full story. ✦`);
+    el.onclick = () => toast(t('toast.full_story'));
     el.innerHTML = `<b>${f.who}</b> ${f.text}<span class="t">${f.t}</span>`;
     list.appendChild(el);
   });
@@ -1392,7 +2281,7 @@ function renderGroups() {
   if (!list) return;
   list.innerHTML = '';
   state.groups.forEach(g => {
-    const done = g.tasks.filter(t => t.done).length;
+    const done = g.tasks.filter(tk => tk.done).length;
     const total = g.tasks.length;
     const pct = total === 0 ? 0 : Math.round((done / total) * 100);
     const el = document.createElement('div');
@@ -1404,14 +2293,14 @@ function renderGroups() {
           <div class="g-eye">${g.eyebrow}</div>
           <div class="g-title">${g.title} <i>${g.titleI}</i></div>
         </div>
-        ${pct === 100 ? '<div class="g-badge">DONE ✦</div>' : ''}
+        ${pct === 100 ? `<div class="g-badge">${t('group.done_badge')}</div>` : ''}
       </div>
       <div class="g-members">
         ${g.members.map(m => `<div class="g-dot ${m.c}">${m.i}</div>`).join('')}
       </div>
       <div class="g-progress-wrap"><div class="g-progress" style="width:${pct}%"></div></div>
       <div class="g-meta">
-        <span><b>${done}</b> of ${total} done</span>
+        <span>${t('group.of_done', { done, total })}</span>
         <span>${g.memberNames}</span>
       </div>
     `;
@@ -1424,6 +2313,41 @@ function renderAll() {
   renderPeople();
   renderFeed();
   renderGroups();
+  renderWeek();
+  updateSharedLine();
+}
+
+function renderWeek() {
+  const container = document.getElementById('weekDays');
+  if (!container) return;
+  container.innerHTML = '';
+  const dayNames = t('week.days');
+  const dayDates = t('week.dates');
+  for (let i = 0; i < 7; i++) {
+    const items = state.reminders.filter(r => (r.dayOffset || 0) === i);
+    const day = document.createElement('div');
+    day.className = 'week-day' + (i === 0 ? ' today' : '') + (items.length === 0 ? ' empty' : '');
+    let itemsHtml = '';
+    if (items.length === 0) {
+      itemsHtml = `<div class="wd-empty">${t('week.quiet')}</div>`;
+    } else {
+      itemsHtml = `<div class="wd-items">` + items.map(r => `
+        <div class="wd-item" onclick="openDetail('${r.id}')">
+          <div class="wd-dot ${r.color}"></div>
+          <div class="wd-time">${r.time} ${r.ampm}</div>
+          <div class="wd-title">${r.title}</div>
+        </div>
+      `).join('') + `</div>`;
+    }
+    day.innerHTML = `
+      <div class="wd-head">
+        <div class="wd-name">${dayNames[i]}</div>
+        <div class="wd-date">${dayDates[i]}</div>
+      </div>
+      ${itemsHtml}
+    `;
+    container.appendChild(day);
+  }
 }
 
 /* ---------- Screen nav ---------- */
@@ -1437,17 +2361,15 @@ function go(name) {
   if (!next) return;
 
   navLock = true;
-  // Prep next screen offscreen-ish, no transition
   next.scrollTop = 0;
 
   if (current) current.classList.remove('active');
   next.classList.add('active');
 
-  // Clean up any stale leaving class after transition
   setTimeout(() => { navLock = false; }, 240);
 
   const tabName = ['home','add','together'].includes(name) ? name : 'home';
-  tabs.forEach(t => t.classList.toggle('active', t.dataset.tab === tabName));
+  tabs.forEach(tb => tb.classList.toggle('active', tb.dataset.tab === tabName));
 }
 
 /* ---------- Detail ---------- */
@@ -1457,13 +2379,63 @@ function openDetail(id) {
   state.currentDetail = id;
   document.getElementById('detail-eyebrow').textContent = r.when;
   document.getElementById('detail-title').textContent = r.title;
-  document.getElementById('detail-time').textContent = r.done ? 'done · nicely handled' : r.relative;
+  document.getElementById('detail-time').textContent = r.done ? t('detail.done_handled') : r.relative;
   document.getElementById('detail-note').innerHTML = r.note;
   document.getElementById('detail-card').style.background =
-    r.color === 'mint' ? 'var(--mint)' :
+    r.color === 'mint'  ? 'var(--mint)'  :
     r.color === 'cream' ? 'var(--cream)' :
     r.color === 'blush' ? 'var(--blush)' : 'var(--lavender-2)';
+
+  const tellCard = document.getElementById('tellCard');
+  if (r.type === 'appointment' && r.providerName) {
+    if (!r.thingsToTell) r.thingsToTell = [];
+    tellCard.style.display = 'block';
+    document.getElementById('tellTitle').innerHTML = t('detail.tell_title', { provider: r.providerName });
+    document.getElementById('tellDesc').textContent = t('detail.tell_desc');
+    renderTellList(r);
+  } else {
+    tellCard.style.display = 'none';
+  }
+
   go('detail');
+}
+
+function renderTellList(r) {
+  const list = document.getElementById('tellList');
+  list.innerHTML = '';
+  if (!r.thingsToTell || r.thingsToTell.length === 0) {
+    const empty = document.createElement('div');
+    empty.className = 'tell-row';
+    empty.innerHTML = `<div class="body"><div class="txt" style="font-family:'Instrument Serif',serif;font-style:italic;color:var(--ink-muted)">${t('detail.tell_empty')}</div></div>`;
+    list.appendChild(empty);
+    return;
+  }
+  r.thingsToTell.forEach(item => {
+    const row = document.createElement('div');
+    row.className = 'tell-row';
+    row.innerHTML = `<div class="bullet"></div><div class="body"><div class="txt">${item.text}</div><div class="meta">${t('detail.tell_added', { ago: item.added })}</div></div>`;
+    list.appendChild(row);
+  });
+}
+
+function addTellItem() {
+  const r = state.reminders.find(x => x.id === state.currentDetail);
+  if (!r) return;
+  const input = document.getElementById('tellInput');
+  const text = (input.value || '').trim();
+  if (!text) return;
+  if (!r.thingsToTell) r.thingsToTell = [];
+  r.thingsToTell.push({ id: 't' + Date.now(), text, added: t('detail.tell_just_now') });
+  input.value = '';
+  renderTellList(r);
+  toast(t('toast.tell_remember'));
+}
+
+function draftTellMessage() {
+  const r = state.reminders.find(x => x.id === state.currentDetail);
+  if (!r) return;
+  const portal = r.portal || t('toast.draft_default_portal');
+  toast(t('toast.draft_ready', { portal }));
 }
 
 function markDone() {
@@ -1471,7 +2443,7 @@ function markDone() {
   if (!id) return;
   const r = state.reminders.find(x => x.id === id);
   if (r) r.done = true;
-  toast("Butler&rsquo;s got it ✓");
+  toast(t('toast.butler_got_it'));
   renderAll();
   setTimeout(() => go('home'), 650);
 }
@@ -1481,29 +2453,27 @@ function snoozeReminder() {
   if (!id) return;
   const r = state.reminders.find(x => x.id === id);
   if (!r) return;
-  // bump by 10 minutes visually
   let [h, m] = r.time.split(':').map(Number);
   m += 10;
   if (m >= 60) { m -= 60; h += 1; }
   r.time = `${h}:${m.toString().padStart(2,'0')}`;
-  r.relative = 'snoozed — 10 minutes later';
-  toast('Snoozed 10 minutes ✦');
+  r.relative = t('toast.snoozed_rel');
+  toast(t('toast.snoozed'));
   renderAll();
   setTimeout(() => go('home'), 650);
 }
 
 /* ---------- Add ---------- */
 function toggleChip(el) {
-  // single-select for "when" group, multi for others — look at parent
   const parent = el.parentElement;
   const groupLabel = parent.previousElementSibling;
-  const isWhen = groupLabel && groupLabel.textContent && groupLabel.textContent.toLowerCase().includes('when');
+  // Detect the "When?" row by checking the label's i18n key (locale-agnostic)
+  const isWhen = groupLabel && groupLabel.getAttribute && groupLabel.getAttribute('data-i18n') === 'add.when_label';
   if (isWhen) {
     parent.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
-    // also clear any stored custom schedule + reset the custom chip label
     state.customWhen = null;
     const customChip = document.getElementById('customWhenChip');
-    if (customChip) customChip.innerHTML = 'Custom… ✦';
+    if (customChip) customChip.textContent = t('add.custom');
   }
   el.classList.toggle('active');
 }
@@ -1512,41 +2482,40 @@ function saveReminder() {
   const textarea = document.querySelector('#add-screen-input') || document.querySelector('[data-screen="add"] .add-input');
   const text = (textarea && textarea.value || '').trim();
   if (!text) {
-    toast('Tell me what to remember ✦');
+    toast(t('toast.need_text'));
     if (textarea) textarea.focus();
     return;
   }
   const colors = ['lav','mint','cream','blush'];
   const nextColor = colors[state.reminders.length % colors.length];
-  // pull selected category chip as sub
   const catChips = document.querySelectorAll('[data-screen="add"] .chips:first-of-type .chip.active');
   const catSub = catChips.length ? Array.from(catChips).map(c => c.textContent).join(' · ') : '';
 
-  // Figure out time + schedule summary (custom wins if set)
   let time, ampm, whenLabel, relative, scheduleSub;
   if (state.customWhen) {
     const cw = state.customWhen;
     time = `${cw.hour}:${cw.minute}`;
     ampm = cw.ampm;
-    const daysSummary = cw.days.length === 0 ? 'Once' :
-      cw.days.length === 7 ? 'every day' :
-      cw.days.length === 5 && ['mon','tue','wed','thu','fri'].every(d => cw.days.includes(d)) ? 'weekdays' :
-      cw.days.length === 2 && cw.days.includes('sat') && cw.days.includes('sun') ? 'weekends' :
+    const daysSummary =
+      cw.days.length === 0 ? t('cw.once') :
+      cw.days.length === 7 ? t('cw.every_day') :
+      cw.days.length === 5 && ['mon','tue','wed','thu','fri'].every(d => cw.days.includes(d)) ? t('cw.weekdays') :
+      cw.days.length === 2 && cw.days.includes('sat') && cw.days.includes('sun') ? t('cw.weekends') :
       cw.days.join(', ');
-    whenLabel = `At ${time} ${ampm} — ${daysSummary}`;
-    relative = `custom schedule`;
+    whenLabel = t('add.whenlabel_at_days', { time, ampm, days: daysSummary });
+    relative = t('add.relative_custom');
     scheduleSub = daysSummary;
   } else {
     const now = new Date();
     const hh = ((now.getHours() + 1) % 24);
     time = (hh % 12 === 0 ? 12 : hh % 12) + ':00';
     ampm = hh >= 12 ? 'PM' : 'AM';
-    whenLabel = `At ${time} ${ampm}`;
-    relative = 'in about an hour';
+    whenLabel = t('add.whenlabel_at', { time, ampm });
+    relative = t('add.relative_hour');
     scheduleSub = '';
   }
 
-  const sub = [catSub, scheduleSub].filter(Boolean).join(' · ') || 'Butler is holding it for you';
+  const sub = [catSub, scheduleSub].filter(Boolean).join(' · ') || t('add.default_sub');
 
   const id = 'r' + Date.now();
   state.reminders.push({
@@ -1557,12 +2526,11 @@ function saveReminder() {
     note: '&ldquo;' + text + '&rdquo;', sharedWith: [], done: false
   });
   if (textarea) textarea.value = '';
-  // reset custom schedule for next add
   state.customWhen = null;
   const customChip = document.getElementById('customWhenChip');
-  if (customChip) customChip.innerHTML = 'Custom… ✦';
+  if (customChip) customChip.textContent = t('add.custom');
   renderAll();
-  toast('Got it. I&rsquo;ll remember. ✦');
+  toast(t('toast.got_it'));
   setTimeout(() => go('home'), 700);
 }
 
@@ -1574,25 +2542,33 @@ function dismissWelcome() {
 /* ---------- Toast ---------- */
 let toastTimer;
 function toast(msg) {
-  const t = document.getElementById('toast');
-  t.innerHTML = msg;
-  t.classList.add('show');
+  const tEl = document.getElementById('toast');
+  tEl.innerHTML = msg;
+  tEl.classList.add('show');
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
+  toastTimer = setTimeout(() => tEl.classList.remove('show'), 2200);
 }
 
 /* ---------- Bottom sheets ---------- */
+// Pending toggle map for the currently open group sheet. Checkbox taps update
+// this staging area — they are NOT committed to state.groups until the user
+// taps "Add it". Tapping "Done" closes without committing. This matches the
+// user's mental model: nothing saves until they confirm.
+let pendingGroupToggles = {};
+
 function openSheet(kind, arg) {
+  currentSheet = { kind, arg };
+  pendingGroupToggles = {}; // reset staging on every sheet open
   const sheet = document.getElementById('sheet');
   const backdrop = document.getElementById('sheetBackdrop');
   const content = document.getElementById('sheetContent');
   content.innerHTML = sheetContent(kind, arg);
   backdrop.classList.add('open');
   sheet.classList.add('open');
-  // wire inner elements after insertion
-  wireSheet(kind, arg);
 }
 function closeSheet() {
+  currentSheet = null;
+  pendingGroupToggles = {}; // discard any un-committed toggles
   document.getElementById('sheet').classList.remove('open');
   document.getElementById('sheetBackdrop').classList.remove('open');
 }
@@ -1600,30 +2576,37 @@ function closeSheet() {
 function sheetContent(kind, arg) {
   if (kind === 'profile') {
     return `
-      <h2>Hi, <i>Tato.</i></h2>
-      <p>You&rsquo;ve been with Butler for 14 days. Everything is on track.</p>
+      <h2>${t('profile.title')}</h2>
+      <p>${t('profile.sub')}</p>
       <div style="margin-top:18px">
         <div class="toggle-row">
-          <div><div class="lbl">Notifications</div><span class="hint">Phone · Text · Email</span></div>
-          <div class="switch on" onclick="this.classList.toggle('on'); toast('Saved ✦')"></div>
+          <div><div class="lbl">${t('profile.notif')}</div><span class="hint">${t('profile.notif_hint')}</span></div>
+          <div class="switch on" onclick="this.classList.toggle('on'); toast(t('profile.saved'))"></div>
         </div>
         <div class="toggle-row">
-          <div><div class="lbl">Quiet hours</div><span class="hint">10 PM – 7 AM</span></div>
-          <div class="switch on" onclick="this.classList.toggle('on'); toast('Saved ✦')"></div>
+          <div><div class="lbl">${t('profile.quiet')}</div><span class="hint">${t('profile.quiet_hint')}</span></div>
+          <div class="switch on" onclick="this.classList.toggle('on'); toast(t('profile.saved'))"></div>
         </div>
         <div class="toggle-row">
-          <div><div class="lbl">Big text</div><span class="hint">Easier to read</span></div>
-          <div class="switch" onclick="this.classList.toggle('on'); toast('Saved ✦')"></div>
+          <div><div class="lbl">${t('profile.bigtext')}</div><span class="hint">${t('profile.bigtext_hint')}</span></div>
+          <div class="switch" onclick="this.classList.toggle('on'); toast(t('profile.saved'))"></div>
+        </div>
+        <div class="toggle-row">
+          <div><div class="lbl">${t('profile.language')}</div><span class="hint">${t('profile.language_hint')}</span></div>
+          <div class="lang-pill inline" role="group" aria-label="${t('profile.language')}" translate="no">
+            <button type="button" data-lang="en" translate="no" class="${locale==='en'?'active':''}" onclick="setLocale('en')">EN</button>
+            <button type="button" data-lang="es" translate="no" class="${locale==='es'?'active':''}" onclick="setLocale('es')">ES</button>
+          </div>
         </div>
       </div>
-      <button class="sheet-btn" onclick="toast('All changes saved ✦'); closeSheet()">Done</button>
-      <button class="sheet-btn secondary" onclick="document.getElementById('welcome').classList.remove('hidden'); closeSheet()">Show the welcome screen again</button>
+      <button class="sheet-btn" onclick="toast(t('profile.all_saved')); closeSheet()">${t('profile.done')}</button>
+      <button class="sheet-btn secondary" onclick="document.getElementById('welcome').classList.remove('hidden'); closeSheet()">${t('profile.show_welcome')}</button>
     `;
   }
   if (kind === 'notifications') {
     return `
-      <h2>What&rsquo;s <i>happening.</i></h2>
-      <p>Quiet, helpful updates — nothing loud.</p>
+      <h2>${t('notif.title')}</h2>
+      <p>${t('notif.sub')}</p>
       <div style="margin-top:18px">
         ${state.notifications.map(n => `
           <div class="notif-item">
@@ -1632,15 +2615,15 @@ function sheetContent(kind, arg) {
           </div>
         `).join('')}
       </div>
-      <button class="sheet-btn" onclick="toast('Cleared ✦'); state.notifications = []; closeSheet()">Mark all as read</button>
+      <button class="sheet-btn" onclick="toast(t('notif.cleared')); state.notifications = []; closeSheet()">${t('notif.mark_all')}</button>
     `;
   }
   if (kind === 'pharmacy') {
     return `
-      <h2>Your <i>pharmacy.</i></h2>
-      <p>Corner of Oak and 5th. Open until 8 PM tonight. No rush — Butler will remind you if you&rsquo;re running low.</p>
-      <button class="sheet-btn" onclick="toast('Directions ready ✦'); closeSheet()">Get directions</button>
-      <button class="sheet-btn secondary" onclick="toast('Butler will call ahead ✦'); closeSheet()">Ask Butler to call ahead</button>
+      <h2>${t('pharmacy.title')}</h2>
+      <p>${t('pharmacy.sub')}</p>
+      <button class="sheet-btn" onclick="toast(t('pharmacy.directions_ready')); closeSheet()">${t('pharmacy.directions')}</button>
+      <button class="sheet-btn secondary" onclick="toast(t('pharmacy.call_scheduled')); closeSheet()">${t('pharmacy.call_ahead')}</button>
     `;
   }
   if (kind === 'person') {
@@ -1648,83 +2631,85 @@ function sheetContent(kind, arg) {
     if (!p) return '';
     return `
       <h2>${p.name}</h2>
-      <p>${p.relation}. You decide what ${p.name} sees. Change anything, any time.</p>
+      <p>${p.relation}. ${t('person.sub', { name: p.name })}</p>
       <div style="margin-top:18px">
         <div class="toggle-row">
-          <div><div class="lbl">Medication reminders</div><span class="hint">So ${p.name} can help</span></div>
+          <div><div class="lbl">${t('person.med')}</div><span class="hint">${t('person.med_hint', { name: p.name })}</span></div>
           <div class="switch ${p.share.medication ? 'on' : ''}" data-key="medication" onclick="toggleShare('${p.id}', 'medication', this)"></div>
         </div>
         <div class="toggle-row">
-          <div><div class="lbl">Appointments</div><span class="hint">Doctor, dentist, etc.</span></div>
+          <div><div class="lbl">${t('person.appts')}</div><span class="hint">${t('person.appts_hint')}</span></div>
           <div class="switch ${p.share.appointments ? 'on' : ''}" data-key="appointments" onclick="toggleShare('${p.id}', 'appointments', this)"></div>
         </div>
         <div class="toggle-row">
-          <div><div class="lbl">Family calls</div><span class="hint">Birthdays and check-ins</span></div>
+          <div><div class="lbl">${t('person.calls')}</div><span class="hint">${t('person.calls_hint')}</span></div>
           <div class="switch ${p.share.calls ? 'on' : ''}" data-key="calls" onclick="toggleShare('${p.id}', 'calls', this)"></div>
         </div>
         <div class="toggle-row">
-          <div><div class="lbl">Location</div><span class="hint">Never on by default</span></div>
+          <div><div class="lbl">${t('person.loc')}</div><span class="hint">${t('person.loc_hint')}</span></div>
           <div class="switch ${p.share.location ? 'on' : ''}" data-key="location" onclick="toggleShare('${p.id}', 'location', this)"></div>
         </div>
       </div>
-      <button class="sheet-btn" onclick="toast('Saved for ${p.name} ✦'); closeSheet()">Done</button>
-      <button class="sheet-btn secondary" onclick="removePerson('${p.id}')">Pause sharing with ${p.name}</button>
+      <button class="sheet-btn" onclick="toast(t('person.saved_for', { name: '${p.name}' })); closeSheet()">${t('person.done')}</button>
+      <button class="sheet-btn secondary" onclick="removePerson('${p.id}')">${t('person.pause', { name: p.name })}</button>
     `;
   }
   if (kind === 'group') {
     const g = state.groups.find(x => x.id === arg);
     if (!g) return '';
-    const done = g.tasks.filter(t => t.done).length;
+    const done = g.tasks.filter(tk => tk.done).length;
     const total = g.tasks.length;
     const pct = total === 0 ? 0 : Math.round((done / total) * 100);
     return `
       <div class="g-eye">${g.eyebrow}</div>
       <h2 style="margin-top:4px">${g.title} <i>${g.titleI}</i></h2>
-      <p>With ${g.memberNames}. Everyone pitches in — Butler keeps score.</p>
+      <p>${t('group.sub', { names: g.memberNames })}</p>
 
       <div class="g-members" style="margin-top:14px">
         ${g.members.map(m => `<div class="g-dot ${m.c}">${m.i}</div>`).join('')}
       </div>
       <div class="g-progress-wrap" style="margin-top:14px"><div class="g-progress" style="width:${pct}%"></div></div>
-      <div class="g-meta"><span><b>${done}</b> of ${total} done</span><span>${pct}%</span></div>
+      <div class="g-meta"><span>${t('group.of_done', { done, total })}</span><span>${pct}%</span></div>
 
       <div style="margin-top:18px">
-        ${g.tasks.map(t => `
-          <div class="task-row ${t.done ? 'done' : ''}" onclick="toggleTask('${g.id}', '${t.id}')">
-            <div class="task-check ${t.done ? 'done' : ''}">✓</div>
+        ${g.tasks.map(tk => {
+          const displayDone = (tk.id in pendingGroupToggles) ? pendingGroupToggles[tk.id] : tk.done;
+          return `
+          <div class="task-row ${displayDone ? 'done' : ''}" onclick="toggleTask('${g.id}', '${tk.id}')">
+            <div class="task-check ${displayDone ? 'done' : ''}">✓</div>
             <div class="task-body">
-              <div class="task-title">${t.title}</div>
-              <div class="task-who">${t.who}</div>
+              <div class="task-title">${tk.title}</div>
+              <div class="task-who">${tk.who}</div>
             </div>
           </div>
-        `).join('')}
+        `;}).join('')}
       </div>
 
-      <input class="sheet-input" id="newTaskInput" placeholder="+ Add something to the list" />
-      <button class="sheet-btn" onclick="addGroupTask('${g.id}')">Add it ✦</button>
-      <button class="sheet-btn secondary" onclick="closeSheet()">Done</button>
+      <input class="sheet-input" id="newTaskInput" placeholder="${t('group.add_ph')}" onkeydown="if(event.key==='Enter'){event.preventDefault();addGroupTask('${g.id}');}" />
+      <button class="sheet-btn" onclick="addGroupTask('${g.id}')">${t('group.add_btn')}</button>
+      <button class="sheet-btn secondary" onclick="closeSheet()">${t('group.done_btn')}</button>
     `;
   }
   if (kind === 'newGroup') {
     return `
-      <h2>Start a <i>group.</i></h2>
-      <p>Give it a name. Invite people. Share the work — Butler keeps everyone in sync.</p>
-      <input class="sheet-input" id="newGroupName" placeholder="Like &ldquo;Weekend hike&rdquo; or &ldquo;Mom&rsquo;s party&rdquo;" />
-      <input class="sheet-input" id="newGroupWhen" placeholder="When? (optional)" />
-      <input class="sheet-input" id="newGroupWith" placeholder="With whom? (comma-separated names)" />
-      <button class="sheet-btn" onclick="createGroup()">Start the group ✦</button>
-      <button class="sheet-btn secondary" onclick="closeSheet()">Not now</button>
+      <h2>${t('newGroup.title')}</h2>
+      <p>${t('newGroup.sub')}</p>
+      <input class="sheet-input" id="newGroupName" placeholder="${t('newGroup.name_ph')}" onkeydown="if(event.key==='Enter'){event.preventDefault();createGroup();}" />
+      <input class="sheet-input" id="newGroupWhen" placeholder="${t('newGroup.when_ph')}" onkeydown="if(event.key==='Enter'){event.preventDefault();createGroup();}" />
+      <input class="sheet-input" id="newGroupWith" placeholder="${t('newGroup.with_ph')}" onkeydown="if(event.key==='Enter'){event.preventDefault();createGroup();}" />
+      <button class="sheet-btn" onclick="createGroup()">${t('newGroup.start')}</button>
+      <button class="sheet-btn secondary" onclick="closeSheet()">${t('newGroup.cancel')}</button>
     `;
   }
   if (kind === 'customWhen') {
     const cw = state.customWhen || { hour: '7', minute: '00', ampm: 'AM', days: [] };
-    const days = ['M','T','W','T','F','S','S'];
+    const dayLetters = t('cw.day_letters');
     const dayKeys = ['mon','tue','wed','thu','fri','sat','sun'];
     const hours = Array.from({length:12}, (_,i) => i+1);
     const mins  = ['00','15','30','45'];
     return `
-      <h2>Custom <i>schedule.</i></h2>
-      <p>Pick the time and days. Butler will nudge you exactly then — not a minute earlier, not a minute later.</p>
+      <h2>${t('cw.title')}</h2>
+      <p>${t('cw.sub')}</p>
 
       <div class="time-picker">
         <select id="cwHour">${hours.map(h => `<option ${String(h)===String(cw.hour)?'selected':''}>${h}</option>`).join('')}</select>
@@ -1736,34 +2721,32 @@ function sheetContent(kind, arg) {
       </div>
 
       <div style="margin-top:16px">
-        <div class="g-eye">Repeat on</div>
+        <div class="g-eye">${t('cw.repeat')}</div>
         <div class="days-row">
-          ${days.map((d, i) => `
+          ${dayLetters.map((d, i) => `
             <div class="day-chip ${cw.days.includes(dayKeys[i]) ? 'active' : ''}" data-day="${dayKeys[i]}" onclick="this.classList.toggle('active')">${d}</div>
           `).join('')}
         </div>
       </div>
 
-      <input class="sheet-input" id="cwLabel" placeholder="What should I remember?" value="${(cw.label||'').replace(/"/g,'&quot;')}" />
+      <input class="sheet-input" id="cwLabel" placeholder="${t('cw.label_ph')}" value="${(cw.label||'').replace(/"/g,'&quot;')}" />
 
-      <button class="sheet-btn" onclick="saveCustomWhen()">Use this schedule ✦</button>
-      <button class="sheet-btn secondary" onclick="closeSheet()">Cancel</button>
+      <button class="sheet-btn" onclick="saveCustomWhen()">${t('cw.use')}</button>
+      <button class="sheet-btn secondary" onclick="closeSheet()">${t('cw.cancel')}</button>
     `;
   }
   if (kind === 'invite') {
     return `
-      <h2>Invite someone <i>you trust.</i></h2>
-      <p>They&rsquo;ll get a friendly note. You stay in charge of everything they can see.</p>
-      <input class="sheet-input" id="inviteName" placeholder="Their name — like &ldquo;Maria&rdquo;" />
-      <input class="sheet-input" id="inviteRelation" placeholder="Who they are — like &ldquo;my son&rdquo;" />
-      <button class="sheet-btn" onclick="sendInvite()">Send the invite ✦</button>
-      <button class="sheet-btn secondary" onclick="closeSheet()">Not now</button>
+      <h2>${t('invite.title')}</h2>
+      <p>${t('invite.sub')}</p>
+      <input class="sheet-input" id="inviteName" placeholder="${t('invite.name_ph')}" onkeydown="if(event.key==='Enter'){event.preventDefault();sendInvite();}" />
+      <input class="sheet-input" id="inviteRelation" placeholder="${t('invite.rel_ph')}" onkeydown="if(event.key==='Enter'){event.preventDefault();sendInvite();}" />
+      <button class="sheet-btn" onclick="sendInvite()">${t('invite.send')}</button>
+      <button class="sheet-btn secondary" onclick="closeSheet()">${t('invite.cancel')}</button>
     `;
   }
   return '';
 }
-
-function wireSheet(kind, arg) { /* hooks are inline — nothing extra needed for now */ }
 
 function toggleShare(personId, key, el) {
   const p = state.people.find(x => x.id === personId);
@@ -1772,7 +2755,11 @@ function toggleShare(personId, key, el) {
   el.classList.toggle('on');
   p.seeing = Object.values(p.share).filter(Boolean).length;
   renderPeople();
-  toast(`${p.name} ${p.share[key] ? 'now sees' : 'no longer sees'} ${key} ✦`);
+  const shareKeyLabel = t('share.' + key);
+  const msg = p.share[key]
+    ? t('person.now_sees',       { name: p.name, key: shareKeyLabel })
+    : t('person.no_longer_sees', { name: p.name, key: shareKeyLabel });
+  toast(msg);
 }
 
 function removePerson(personId) {
@@ -1781,56 +2768,99 @@ function removePerson(personId) {
   const name = state.people[idx].name;
   state.people.splice(idx, 1);
   renderPeople();
-  toast(`Sharing with ${name} paused ✦`);
+  toast(t('person.paused', { name }));
   closeSheet();
 }
 
 function toggleTask(groupId, taskId) {
   const g = state.groups.find(x => x.id === groupId);
   if (!g) return;
-  const t = g.tasks.find(x => x.id === taskId);
-  if (!t) return;
-  t.done = !t.done;
-  renderGroups();
-  // re-render just this sheet's content (lightweight: just refresh rows)
+  const tk = g.tasks.find(x => x.id === taskId);
+  if (!tk) return;
+  // Stage the toggle — don't commit to state.groups yet. "Add it" commits,
+  // "Done" discards. This way tapping Done never accidentally saves a check.
+  const current = (tk.id in pendingGroupToggles) ? pendingGroupToggles[tk.id] : tk.done;
+  const next = !current;
+  if (next === tk.done) {
+    // toggled back to the original — clear the staged change
+    delete pendingGroupToggles[tk.id];
+  } else {
+    pendingGroupToggles[tk.id] = next;
+  }
+  // Re-render only the sheet; leave the underlying group card alone until commit.
   const content = document.getElementById('sheetContent');
   if (content) content.innerHTML = sheetContent('group', groupId);
-  if (t.done) toast(`${t.title} — done ✦`);
 }
 
 function addGroupTask(groupId) {
   const input = document.getElementById('newTaskInput');
   const val = (input && input.value || '').trim();
-  if (!val) { toast('Type a task first ✦'); return; }
   const g = state.groups.find(x => x.id === groupId);
   if (!g) return;
-  g.tasks.push({ id: 'g' + Date.now(), title: val, who: 'You', done: false });
+
+  // Commit any staged checkbox toggles.
+  const pendingKeys = Object.keys(pendingGroupToggles);
+  let toggledCount = 0;
+  let lastToggledDoneTitle = null;
+  pendingKeys.forEach(tid => {
+    const tk = g.tasks.find(x => x.id === tid);
+    if (!tk) return;
+    if (tk.done !== pendingGroupToggles[tid]) {
+      tk.done = pendingGroupToggles[tid];
+      toggledCount++;
+      if (tk.done) lastToggledDoneTitle = tk.title;
+    }
+  });
+  pendingGroupToggles = {};
+
+  // Add the new task if the user typed one.
+  if (val) {
+    g.tasks.push({ id: 'g' + Date.now(), title: val, who: locale === 'es' ? 'Tú' : 'You', done: false });
+  }
+
   renderGroups();
-  document.getElementById('sheetContent').innerHTML = sheetContent('group', groupId);
-  toast('Added to the list ✦');
+
+  // Nothing happened at all → just close the sheet, no toast.
+  if (!val && toggledCount === 0) { closeSheet(); return; }
+
+  // If the user added a new task, keep the sheet open so they can add more.
+  // If they only committed toggles, close the sheet — the action is complete.
+  if (val) {
+    document.getElementById('sheetContent').innerHTML = sheetContent('group', groupId);
+    toast(t('group.added_list'));
+  } else {
+    if (lastToggledDoneTitle) {
+      toast(t('group.task_done', { title: lastToggledDoneTitle }));
+    }
+    closeSheet();
+  }
 }
 
 function createGroup() {
   const name = document.getElementById('newGroupName').value.trim();
   const when = document.getElementById('newGroupWhen').value.trim();
   const withWhom = document.getElementById('newGroupWith').value.trim();
-  if (!name) { toast('Give it a name ✦'); return; }
+  if (!name) { toast(t('newGroup.need_name')); return; }
   const names = withWhom ? withWhom.split(',').map(s => s.trim()).filter(Boolean) : [];
   const colors = ['mint','cream','blush','lav'];
   const members = [{ i: 'T', c: 'mint' }, ...names.map((n, i) => ({ i: n[0].toUpperCase(), c: colors[(i+1) % colors.length] }))];
   state.groups.unshift({
     id: 'g' + Date.now(),
-    eyebrow: when || 'Soon',
+    eyebrow: when || t('newGroup.soon'),
     title: name,
     titleI: '',
     members,
-    memberNames: names.length ? 'you, ' + names.join(', ') : 'just you',
+    memberNames: names.length ? t('newGroup.you_with', { names: names.join(', ') }) : t('newGroup.you_alone'),
     dark: false,
     tasks: [],
   });
-  state.feed.unshift({ who: 'You', text: `started a new group: ${name}.`, t: 'just now' });
+  state.feed.unshift({
+    who: locale === 'es' ? 'Tú' : 'You',
+    text: t('newGroup.feed_text', { name }),
+    t: locale === 'es' ? 'ahora mismo' : 'just now',
+  });
   renderAll();
-  toast('Group started ✦');
+  toast(t('newGroup.started'));
   closeSheet();
 }
 
@@ -1842,51 +2872,53 @@ function saveCustomWhen() {
   const days = Array.from(document.querySelectorAll('.day-chip.active')).map(el => el.dataset.day);
   state.customWhen = { hour, minute, ampm, days, label };
 
-  // Mark the "Custom" chip as active in the Add screen When group
-  document.querySelectorAll('[data-screen="add"] .chips').forEach((grp, idx) => {
-    // 2nd chips group is the When row
-  });
   const customChip = document.getElementById('customWhenChip');
   if (customChip) {
-    // deselect siblings, select custom
     const parent = customChip.parentElement;
     parent.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
     customChip.classList.add('active');
-    const daysSummary = days.length === 0 ? 'Once' :
-      days.length === 7 ? 'Every day' :
-      days.length === 5 && ['mon','tue','wed','thu','fri'].every(d => days.includes(d)) ? 'Weekdays' :
-      days.length + ' days/week';
-    customChip.innerHTML = `${hour}:${minute} ${ampm} · ${daysSummary} ✦`;
+    const daysSummary =
+      days.length === 0 ? t('cw.once') :
+      days.length === 7 ? t('cw.every_day_cap') :
+      days.length === 5 && ['mon','tue','wed','thu','fri'].every(d => days.includes(d)) ? t('cw.weekdays_cap') :
+      t('cw.days_week', { n: days.length });
+    customChip.textContent = `${hour}:${minute} ${ampm} · ${daysSummary} ✦`;
   }
-  toast('Schedule saved ✦');
+  toast(t('cw.saved'));
   closeSheet();
 }
 
 function sendInvite() {
   const name = document.getElementById('inviteName').value.trim();
   const rel = document.getElementById('inviteRelation').value.trim();
-  if (!name) { toast('A name, please ✦'); return; }
+  if (!name) { toast(t('invite.need_name')); return; }
   const initials = name[0].toUpperCase();
   const colors = ['mint','cream','blush'];
   state.people.push({
     id: 'p' + Date.now(),
     name,
     initial: initials,
-    relation: rel || 'Someone you trust',
+    relation: rel || t('invite.default_rel'),
     color: colors[state.people.length % colors.length],
     seeing: 0,
     share: { medication: false, appointments: false, calls: false, location: false }
   });
-  state.feed.unshift({ who: 'You', text: `invited ${name} to share your Butler.`, t: 'just now' });
+  state.feed.unshift({
+    who: locale === 'es' ? 'Tú' : 'You',
+    text: t('invite.feed_text', { name }),
+    t: locale === 'es' ? 'ahora mismo' : 'just now',
+  });
   renderAll();
-  toast(`Invite sent to ${name} ✦`);
+  toast(t('invite.sent', { name }));
   closeSheet();
 }
 
 /* ---------- Boot ---------- */
-// Give the add-screen input a stable id so saveReminder can find it reliably
 document.querySelector('[data-screen="add"] .add-input').id = 'add-screen-input';
 
+locale = detectLocale();
+state = buildState(locale);
+applyStaticI18n();
 renderAll();
 
 // ESC: close sheet, else reopen welcome
@@ -1900,6 +2932,7 @@ document.addEventListener('keydown', (e) => {
     }
   }
 });
+
 </script>
 </body>
 </html>
